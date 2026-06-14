@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Estadístico Mundial 2026</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-live">● LIVE</span> MUNDIAL 2026
+            </div>
+            <ul class="nav-menu">
+                <li><a class="nav-link active" data-target="view-inicio">Inicio</a></li>
+                <li><a class="nav-link" data-target="view-calendario">Calendario</a></li>
+                <li><a class="nav-link" data-target="view-grupos">Grupos</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="main-header">
+        <h1>PORTAL ESTADÍSTICO MUNDIAL 2026</h1>
+        <p>Probabilidades de Victoria, Fixtures y Grupos de Equipos</p>
+    </header>
+
+    <div class="page-layout">
+        <main class="content-area">
+            
+            <div id="view-inicio" class="tab-content active-view">
+                <div class="summary-card">
+                    <h2>Bienvenido al Portal Oficial de Análisis</h2>
+                    <p>Usa la barra de navegación superior para explorar los fixtures completos del torneo y la composición de los grupos de las selecciones clasificadas.</p>
+                    <p>A la derecha tienes disponible nuestro panel de <strong>Consultas con IA</strong> para resolver cualquier duda estadística sobre los partidos de forma inmediata.</p>
+                </div>
+            </div>
+
+            <div id="view-calendario" class="tab-content">
+                <h2>Calendario de Partidos & Predicciones</h2>
+                <div class="calendar-table">
+                    <div class="calendar-header">
+                        <div>FECHA Y DETALLES</div>
+                        <div>PARTIDO & PROBABILIDADES</div>
+                    </div>
+                    
+                    {% for match in matches %}
+                    <article class="calendar-row">
+                        <div class="match-date-box">
+                            <span class="date-highlight">{{ match.date }}</span>
+                            <span class="time-text">{{ match.location }}</span>
+                        </div>
+                        
+                        <div class="match-details-box">
+                            <div class="teams-versus-row">
+                                <div class="team-display text-left">
+                                    <h3 class="team-name-text">{{ match.teamA }}</h3>
+                                    <span class="elo-text-small">Elo {{ match.eloA }}</span>
+                                </div>
+                                <div class="vs-badge">vs</div>
+                                <div class="team-display text-right">
+                                    <h3 class="team-name-text">{{ match.teamB }}</h3>
+                                    <span class="elo-text-small">Elo {{ match.eloB }}</span>
+                                </div>
+                            </div>
+
+                            <div class="probability-bar-container">
+                                <div class="bar bar-win-a" style="width: {{ match.probWinA|round(1) }}%">{{ match.probWinA|round(1) }}%</div>
+                                <div class="bar bar-draw" style="width: {{ match.probDraw|round(1) }}%">{{ match.probDraw|round(1) }}%</div>
+                                <div class="bar bar-win-b" style="width: {{ match.probWinB|round(1) }}%">{{ match.probWinB|round(1) }}%</div>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="view-grupos" class="tab-content">
+                <h2>Configuración de Grupos Oficiales</h2>
+                <div class="groups-grid">
+                    {% for nombre_grupo, equipos in grupos.items() %}
+                    <article class="group-box-card">
+                        <div class="group-card-header">{{ nombre_grupo }}</div>
+                        <ul class="group-teams-list">
+                            {% for team in equipos %}
+                            <li>
+                                <img src="{{ url_for('static', filename=team.flag) }}" alt="Bandera">
+                                <div class="team-info-block">
+                                    <strong class="team-title">{{ team.name }}</strong>
+                                    <small class="team-subtitle">Goleador: {{ team.top_scorer }}</small>
+                                </div>
+                                <span class="rank-badge">#{{ team.ranking }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </main>
+
+        <aside class="ai-sidebar">
+            <div class="ai-sticky-box">
+                <h3>Consultas con IA</h3>
+                <p>Pregúntame estadísticas sobre los rivales o quién ganará el partido.</p>
+                
+                <div class="chat-display" id="chatDisplay" aria-live="polite" role="log">
+                    <p class="bot-text">Asistente: ¡Hola! ¿Qué partido deseas analizar hoy?</p>
+                </div>
+
+                <form class="chat-input-row" id="chatForm">
+                    <input type="text" id="question" name="question" placeholder="Ej. ¿Qué probabilidad tiene México?" autocomplete="off">
+                    <button type="submit">Preguntar</button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Lógica de cambio de pestañas en el Navbar
+        const links = document.querySelectorAll('.nav-link');
+        const contents = document.querySelectorAll('.tab-content');
+
+        links.forEach(link => {
+            link.addEventListener('click', function() {
+                // Quitar clase activa a todos los enlaces
+                links.forEach(l => l.classList.remove('active'));
+                // Ocultar todas las vistas
+                contents.forEach(c => c.classList.remove('active-view'));
+
+                // Activar enlace actual y su vista objetivo
+                this.classList.add('active');
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active-view');
+            });
+        });
+
+        // Lógica del Chat con Flask (Ruta /ask)
+        const chatForm = document.getElementById("chatForm");
+        const chatDisplay = document.getElementById("chatDisplay");
+        const questionInput = document.getElementById("question");
+
+        chatForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            appendMessage("user-text", `Tú: ${question}`);
+            questionInput.value = "";
+
+            try {
+                const response = await fetch("/ask", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question })
+                });
+                const data = await response.json();
+                appendMessage("bot-text", `Asistente: ${data.answer}`);
+            } catch (error) {
+                appendMessage("bot-text", "Asistente: Error al conectar con el servidor.");
+            }
+        });
+
+        function appendMessage(className, text) {
+            const paragraph = document.createElement("p");
+            paragraph.className = className;
+            paragraph.textContent = text;
+            chatDisplay.appendChild(paragraph);
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
+        }
+    </script>
+</body>
+</html>
