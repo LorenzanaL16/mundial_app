@@ -1,0 +1,173 @@
+:root {
+    --bg-dark: #0d0f14;
+    --panel-dark: #141822;
+    --text-light: #ffffff;
+    --text-muted: #8a96a3;
+    --color-win-a: #f1c40f; /* Amarillo */
+    --color-draw: #34495e;  /* Gris */
+    --color-win-b: #3498db; /* Azul */
+    --border-line: #222b3c;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+}
+
+/* NAVBAR INTERACTIVA */
+.navbar {
+    background-color: var(--panel-dark);
+    border-bottom: 2px solid var(--border-line);
+    padding: 12px 0;
+}
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.nav-logo {
+    font-weight: bold;
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+}
+.logo-live {
+    color: var(--color-win-a);
+    font-size: 0.9rem;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+}
+.nav-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 4px;
+}
+.nav-link.active, .nav-link:hover {
+    color: var(--text-light);
+    background-color: var(--bg-dark);
+}
+
+/* SISTEMA DE PESTAÑAS (VISTAS) */
+.tab-content {
+    display: none; /* Por defecto todo oculto */
+}
+.tab-content.active-view {
+    display: block; /* Solo se muestra la pestaña activa */
+}
+
+/* COMODINES DE DISEÑO */
+.main-header {
+    text-align: center;
+    padding: 30px 20px;
+    background-color: var(--panel-dark);
+    border-bottom: 1px solid var(--border-line);
+}
+.main-header h1 { margin: 0; font-size: 2.2rem; }
+.main-header p { color: var(--text-muted); margin: 5px 0 0 0; }
+
+.page-layout {
+    display: flex;
+    max-width: 1400px;
+    margin: 20px auto;
+    gap: 25px;
+    padding: 0 20px;
+}
+.content-area { flex: 3; }
+.ai-sidebar { flex: 1; min-width: 320px; }
+
+/* SECCIÓN INICIO: VISTA RESUMEN COMPACTA */
+.summary-card {
+    background-color: var(--panel-dark);
+    border: 1px solid var(--border-line);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* VISTA CALENDARIO TIPO TABLA */
+.calendar-table {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-line);
+}
+.calendar-header {
+    display: grid;
+    grid-template-columns: 1.2fr 3fr;
+    background-color: var(--panel-dark);
+    padding: 12px 15px;
+    font-weight: bold;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-line);
+}
+.calendar-row {
+    display: grid;
+    grid-template-columns: 1.2fr 3fr;
+    background-color: var(--panel-dark);
+    border-bottom: 1px solid var(--border-line);
+}
+.match-date-box {
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    border-right: 1px solid var(--border-line);
+}
+.date-highlight { color: var(--color-win-a); font-weight: bold; }
+.time-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+.match-details-box { padding: 15px 20px; }
+.teams-versus-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.team-display { flex: 1; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.team-name-text { font-size: 1.3rem; font-weight: bold; margin: 0; }
+.elo-text-small { font-size: 0.85rem; color: var(--color-win-a); }
+.vs-badge { color: var(--text-muted); font-style: italic; }
+
+.probability-bar-container { display: flex; height: 30px; border-radius: 6px; overflow: hidden; font-weight: bold; }
+.bar { display: flex; align-items: center; justify-content: center; color: #000; font-size: 0.9rem; }
+.bar-win-a { background-color: var(--color-win-a); }
+.bar-draw { background-color: var(--color-draw); color: white; }
+.bar-win-b { background-color: var(--color-win-b); color: white; }
+
+/* VISTA GRUPOS */
+.groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.group-box-card { background-color: var(--panel-dark); border: 1px solid var(--border-line); border-radius: 8px; overflow: hidden; }
+.group-card-header { background-color: rgba(255, 255, 255, 0.03); padding: 12px; font-weight: bold; text-align: center; border-bottom: 2px solid var(--border-line); }
+.group-teams-list { list-style: none; padding: 0; margin: 0; }
+.group-teams-list li { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-bottom: 1px solid #1c2331; }
+.group-teams-list li:last-child { border-bottom: none; }
+.group-teams-list img { width: 32px; height: 20px; object-fit: cover; border-radius: 4px; background-color: #2a2d34; }
+.team-info-block { flex: 1; }
+.team-title { font-size: 1rem; display: block; }
+.team-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+.rank-badge { color: var(--color-win-a); font-weight: bold; }
+
+/* ASISTENTE CHAT */
+.ai-sticky-box { background-color: var(--panel-dark); border: 1px solid var(--border-line); border-radius: 8px; padding: 20px; position: sticky; top: 20px; }
+.chat-display { height: 300px; background-color: var(--bg-dark); border: 1px solid var(--border-line); border-radius: 4px; padding: 10px; overflow-y: auto; margin-bottom: 15px; }
+.chat-display p { margin: 8px 0; padding: 6px 10px; border-radius: 4px; font-size: 0.9rem; }
+.bot-text { background-color: #1c2331; border-left: 3px solid var(--color-win-b); }
+.user-text { background-color: #2c3e50; text-align: right; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input-row input { flex: 1; padding: 10px; background-color: var(--bg-dark); border: 1px solid var(--border-line); color: white; border-radius: 4px; }
+.chat-input-row button { background-color: var(--color-win-a); color: black; font-weight: bold; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer; }
