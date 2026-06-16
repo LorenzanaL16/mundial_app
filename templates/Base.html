@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Predictor Mundial 2026</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="worldcup-header">
+    Predictor Mundial FIFA 2026
+</div>
+
+<div class="worldcup-subheader">
+    FIFA WORLD CUP 2026 — MÉXICO · CANADÁ · USA
+</div>
+
+<header class="topbar">
+
+    <div class="logo">
+        ⚽ Predictor 2026
+    </div>
+
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="/grupos">Grupos</a>
+        <a href="/fixture">Fixture</a>
+        <a href="/equipos">Equipos</a>
+        <a href="/predicciones">Predicciones</a>
+        <a href="/chatbot">Chatbot IA</a>
+    </nav>
+
+</header>
+
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
+
+<footer class="footer">
+    Predictor Mundial 2026 — Universidad Mariano Gálvez
+</footer>
+
+</body>
+</html>

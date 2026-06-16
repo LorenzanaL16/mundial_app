@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">⚽ Los Grupos del Mundial 2026</h1>
+
+<div class="groups-grid">
+
+    {% for grupo, equipos_grupo in grupos.items() %}
+
+    <div class="group-card">
+
+        <h2>{{ grupo }}</h2>
+
+        <table class="group-table">
+
+            <tr>
+                <th>Equipo</th>
+                <th>Ranking FIFA</th>
+            </tr>
+
+            {% for equipo in equipos_grupo %}
+            <tr>
+                <td>{{ equipo.name }}</td>
+                <td>#{{ equipo.ranking }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

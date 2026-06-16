@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">📅 Fixture Mundial 2026</h1>
+
+<div class="fixture-container">
+
+    {% for match in matches %}
+
+    <div class="match-card">
+
+        <div class="match-header">
+            <span>{{ match.date }}</span>
+            <span>{{ match.location }}</span>
+        </div>
+
+        <div class="teams">
+
+            <div class="team">
+                <h3>{{ match.teamA }}</h3>
+                <p>ELO: {{ match.eloA }}</p>
+            </div>
+
+            <div class="vs">
+                VS
+            </div>
+
+            <div class="team">
+                <h3>{{ match.teamB }}</h3>
+                <p>ELO: {{ match.eloB }}</p>
+            </div>
+
+        </div>
+
+        <div class="probabilities">
+
+            <div class="prob-box">
+                <strong>{{ match.probWinA }}%</strong>
+                <span>Gana {{ match.teamA }}</span>
+            </div>
+
+            <div class="prob-box">
+                <strong>{{ match.probDraw }}%</strong>
+                <span>Empate</span>
+            </div>
+
+            <div class="prob-box">
+                <strong>{{ match.probWinB }}%</strong>
+                <span>Gana {{ match.teamB }}</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

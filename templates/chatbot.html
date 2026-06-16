@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">🤖 Chatbot IA Mundial 2026</h1>
+
+<div class="chat-container">
+
+    <div class="chat-header">
+        Asistente Inteligente FIFA World Cup 2026
+    </div>
+
+    <div class="chat-messages">
+
+        <div class="bot-message">
+            <strong>IA:</strong>
+            Hola 👋. Soy el asistente del Predictor Mundial 2026.
+            Pregúntame sobre equipos, grupos, rankings FIFA o predicciones.
+        </div>
+
+        <div class="user-message">
+            <strong>Tú:</strong>
+            ¿Quién es favorito para ganar el Mundial?
+        </div>
+
+        <div class="bot-message">
+            <strong>IA:</strong>
+            Según el modelo actual, Argentina, Francia y Brasil son los principales candidatos.
+        </div>
+
+    </div>
+
+    <div class="chat-input-area">
+
+        <input
+            type="text"
+            placeholder="Escribe tu pregunta..."
+        >
+
+        <button>
+            Enviar
+        </button>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title">🏆 Equipos Clasificados</h1>
+
+<div class="teams-grid">
+
+    {% for equipo in equipos %}
+
+    <div class="team-card">
+
+        <div class="team-icon">
+            ⚽
+        </div>
+
+        <h2>{{ equipo.name }}</h2>
+
+        <p>Ranking FIFA</p>
+
+        <span>#{{ equipo.ranking }}</span>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
