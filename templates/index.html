@@ -2,103 +2,46 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mundial 2026</title>
+    <title>Predictor Mundial 2026</title>
 
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-    <h1>Mundial 2026</h1>
+<div class="worldcup-header">
+    Predictor Mundial FIFA 2026
+</div>
 
-    <!-- CALENDARIO -->
-    <div id="view-calendario" class="tab-content">
-        <h2>Calendario de Partidos & Predicciones</h2>
+<div class="worldcup-subheader">
+    FIFA WORLD CUP 2026 — MÉXICO · CANADÁ · USA
+</div>
 
-        {% for match in matches %}
-        <article class="calendar-row">
+<header class="topbar">
 
-            <div class="match-date-box">
-                <span>{{ match.date }}</span>
-                <span>{{ match.location }}</span>
-            </div>
-
-            <div class="match-details-box">
-
-                <div class="teams-versus-row">
-                    <div>
-                        <h3>{{ match.teamA }}</h3>
-                        <small>Elo {{ match.eloA }}</small>
-                    </div>
-
-                    <strong>VS</strong>
-
-                    <div>
-                        <h3>{{ match.teamB }}</h3>
-                        <small>Elo {{ match.eloB }}</small>
-                    </div>
-                </div>
-
-                <p>
-                    {{ match.probWinA }}% |
-                    {{ match.probDraw }}% |
-                    {{ match.probWinB }}%
-                </p>
-
-            </div>
-
-        </article>
-        {% endfor %}
-
+    <div class="logo">
+        ⚽ Predictor 2026
     </div>
 
-    <!-- GRUPOS -->
-    <div id="view-grupos" class="tab-content">
-        <h2>Configuración de Grupos Oficiales</h2>
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="/grupos">Grupos</a>
+        <a href="/fixture">Fixture</a>
+        <a href="/equipos">Equipos</a>
+        <a href="/predicciones">Predicciones</a>
+        <a href="/chatbot">Chatbot IA</a>
+    </nav>
 
-        <div class="groups-grid">
+</header>
 
-            {% for nombre_grupo, equipos in grupos.items() %}
-            <article class="group-box-card">
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
 
-                <div class="group-card-header">
-                    {{ nombre_grupo }}
-                </div>
-
-                <ul class="group-teams-list">
-
-                    {% for team in equipos %}
-                    <li>
-
-                        <img
-                            src="{{ url_for('static', filename=team.flag) }}"
-                            alt="{{ team.name }}"
-                            width="40"
-                        >
-
-                        <div class="team-info-block">
-                            <strong>{{ team.name }}</strong>
-                            <br>
-                            <small>
-                                Goleador: {{ team.top_scorer }}
-                            </small>
-                        </div>
-
-                        <span>
-                            #{{ team.ranking }}
-                        </span>
-
-                    </li>
-                    {% endfor %}
-
-                </ul>
-
-            </article>
-            {% endfor %}
-
-        </div>
-    </div>
+<footer class="footer">
+    Predictor Mundial 2026 — Universidad Mariano Gálvez
+</footer>
 
 </body>
 </html>
