@@ -318,10 +318,16 @@ nav a:hover{
     box-shadow:0 3px 12px rgba(0,0,0,.08);
 
     transition:.3s;
+
+    border:2px solid transparent;
 }
 
 .team-card:hover{
     transform:translateY(-5px);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+
+    border-color:#0a84ff;
 }
 
 .team-icon{
@@ -342,6 +348,12 @@ nav a:hover{
     font-size:30px;
     font-weight:bold;
     color:#0f9b5f;
+}
+
+.team-card span{
+    font-size:24px;
+    font-weight:bold;
+    color:#0a84ff;
 }
 
 /* =========================
