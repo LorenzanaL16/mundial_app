@@ -75,7 +75,35 @@ grupos = {
     {"name": "Cabo Verde", "ranking": 72},
     {"name": "Arabia Saudita", "ranking": 58},
     {"name": "Uruguay", "ranking": 13}
-    ]
+    ],
+
+"Grupo I": [
+    {"name": "Francia", "ranking": 2},
+    {"name": "Senegal", "ranking": 18},
+    {"name": "Irak", "ranking": 58},
+    {"name": "Noruega", "ranking": 43}
+],
+
+"Grupo J": [
+    {"name": "Argentina", "ranking": 1},
+    {"name": "Argelia", "ranking": 37},
+    {"name": "Austria", "ranking": 22},
+    {"name": "Jordania", "ranking": 64}
+],
+
+"Grupo K": [
+    {"name": "Portugal", "ranking": 6},
+    {"name": "República Democrática del Congo", "ranking": 61},
+    {"name": "Uzbekistán", "ranking": 57},
+    {"name": "Colombia", "ranking": 14}
+],
+
+"Grupo L": [
+    {"name": "Inglaterra", "ranking": 4},
+    {"name": "Croacia", "ranking": 11},
+    {"name": "Ghana", "ranking": 76},
+    {"name": "Panamá", "ranking": 44}
+],
 }
 
 equipos = []
