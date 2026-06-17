@@ -23,20 +23,39 @@ matches = [
 grupos = {
     "Grupo A": [
         {"name": "México", "ranking": 15},
-        {"name": "Sudáfrica", "ranking": 59}
+        {"name": "Sudáfrica", "ranking": 59},
+        {"name": "Corea del Sur", "ranking": 23},
+        {"name": "República Checa", "ranking": 42}
     ],
+
     "Grupo B": [
-        {"name": "Argentina", "ranking": 1},
-        {"name": "Francia", "ranking": 2}
+        {"name": "Canadá", "ranking": 31},
+        {"name": "Bosnia y Herzegovina", "ranking": 74},
+        {"name": "Qatar", "ranking": 55},
+        {"name": "Suiza", "ranking": 20}
+    ],
+
+    "Grupo C": [
+        {"name": "Brasil", "ranking": 3},
+        {"name": "Marruecos", "ranking": 12},
+        {"name": "Haití", "ranking": 83},
+        {"name": "Escocia", "ranking": 28}
+    ],
+
+    "Grupo D": [
+        {"name": "Estados Unidos", "ranking": 16},
+        {"name": "Paraguay", "ranking": 53},
+        {"name": "Australia", "ranking": 24},
+        {"name": "Turquía", "ranking": 35}
     ]
 }
 
-equipos = [
-    {"name": "México", "ranking": 15},
-    {"name": "Argentina", "ranking": 1},
-    {"name": "Brasil", "ranking": 3},
-    {"name": "Francia", "ranking": 2}
-]
+equipos = []
+
+for grupo, lista in grupos.items():
+    for equipo in lista:
+        equipo["group"] = grupo
+        equipos.append(equipo)
 
 # =========================
 # RUTAS
