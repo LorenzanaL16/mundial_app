@@ -47,6 +47,34 @@ grupos = {
         {"name": "Paraguay", "ranking": 53},
         {"name": "Australia", "ranking": 24},
         {"name": "Turquía", "ranking": 35}
+    ],
+
+"Grupo E": [
+    {"name": "Alemania", "ranking": 10},
+    {"name": "Curazao", "ranking": 90},
+    {"name": "Costa de Marfil", "ranking": 41},
+    {"name": "Ecuador", "ranking": 24}
+    ],
+
+"Grupo F": [
+    {"name": "Países Bajos", "ranking": 7},
+    {"name": "Japón", "ranking": 17},
+    {"name": "Suecia", "ranking": 28},
+    {"name": "Túnez", "ranking": 49}
+    ],
+
+"Grupo G": [
+    {"name": "Bélgica", "ranking": 8},
+    {"name": "Egipto", "ranking": 36},
+    {"name": "Irán", "ranking": 20},
+    {"name": "Nueva Zelanda", "ranking": 94}
+    ],
+
+"Grupo H": [
+    {"name": "España", "ranking": 3},
+    {"name": "Cabo Verde", "ranking": 72},
+    {"name": "Arabia Saudita", "ranking": 58},
+    {"name": "Uruguay", "ranking": 13}
     ]
 }
 
