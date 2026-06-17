@@ -199,12 +199,34 @@ nav a:hover{
     background:white;
     border-radius:15px;
     padding:25px;
+
     box-shadow:0 3px 12px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+    border:2px solid transparent;
+}
+
+.group-card:hover{
+    transform:translateY(-5px);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+
+    border-color:#0a84ff;
+}
+
+.group-table tr:nth-child(even){
+    background:#f9fafb;
+}
+
+.group-table tr:hover{
+    background:#eaf3ff;
 }
 
 .group-card h2{
+    text-align:center;
     margin-bottom:15px;
-    color:#0f9b5f;
+    color:#0a84ff;
 }
 
 .group-table{
@@ -213,7 +235,7 @@ nav a:hover{
 }
 
 .group-table th{
-    text-align:left;
+    text-align:center;
     background:#f3f5f7;
     padding:12px;
 }
@@ -221,6 +243,20 @@ nav a:hover{
 .group-table td{
     padding:12px;
     border-bottom:1px solid #eee;
+    text-align:center;
+}
+
+.group-table img{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-right:8px;
+    vertical-align:middle;
+}
+
+.group-table td{
+    vertical-align:middle;
 }
 
 /* =========================

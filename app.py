@@ -22,87 +22,87 @@ matches = [
 
 grupos = {
     "Grupo A": [
-        {"name": "México", "ranking": 15},
-        {"name": "Sudáfrica", "ranking": 59},
-        {"name": "Corea del Sur", "ranking": 23},
-        {"name": "República Checa", "ranking": 42}
+        {"name": "México", "ranking": 15,"flag": "img/flags/mexico.png"},
+        {"name": "Sudáfrica", "ranking": 59, "flag": "img/flags/sudafrica.png"},
+        {"name": "Corea del Sur", "ranking": 23, "flag": "img/flags/corea-del-sur.png"},
+        {"name": "República Checa", "ranking": 42, "flag": "img/flags/republica-checa.png"}
     ],
 
     "Grupo B": [
-        {"name": "Canadá", "ranking": 31},
-        {"name": "Bosnia y Herzegovina", "ranking": 74},
-        {"name": "Qatar", "ranking": 55},
-        {"name": "Suiza", "ranking": 20}
+        {"name": "Canadá", "ranking": 31, "flag": "img/flags/canada.png"},
+        {"name": "Bosnia y Herzegovina", "ranking": 74, "flag": "img/flags/bosnia-y-herzegovina.png"},
+        {"name": "Qatar", "ranking": 55, "flag": "img/flags/qatar.png"},
+        {"name": "Suiza", "ranking": 20, "flag": "img/flags/suiza.png"}
     ],
 
     "Grupo C": [
-        {"name": "Brasil", "ranking": 3},
-        {"name": "Marruecos", "ranking": 12},
-        {"name": "Haití", "ranking": 83},
-        {"name": "Escocia", "ranking": 28}
+        {"name": "Brasil", "ranking": 3, "flag": "img/flags/brasil.png"},
+        {"name": "Marruecos", "ranking": 12, "flag": "img/flags/marruecos.png"},
+        {"name": "Haití", "ranking": 83, "flag": "img/flags/haiti.png"},
+        {"name": "Escocia", "ranking": 28, "flag": "img/flags/escocia.png"}
     ],
 
     "Grupo D": [
-        {"name": "Estados Unidos", "ranking": 16},
-        {"name": "Paraguay", "ranking": 53},
-        {"name": "Australia", "ranking": 24},
-        {"name": "Turquía", "ranking": 35}
+        {"name": "Estados Unidos", "ranking": 16, "flag": "img/flags/estados-unidos.png"},
+        {"name": "Paraguay", "ranking": 53, "flag": "img/flags/paraguay.png"},
+        {"name": "Australia", "ranking": 24, "flag": "img/flags/australia.png"},
+        {"name": "Turquía", "ranking": 35, "flag": "img/flags/turquia.png"}
     ],
 
 "Grupo E": [
-    {"name": "Alemania", "ranking": 10},
-    {"name": "Curazao", "ranking": 90},
-    {"name": "Costa de Marfil", "ranking": 41},
-    {"name": "Ecuador", "ranking": 24}
+    {"name": "Alemania", "ranking": 10, "flag": "img/flags/alemania.png"},
+    {"name": "Curazao", "ranking": 90, "flag": "img/flags/curazao.png"},
+    {"name": "Costa de Marfil", "ranking": 41, "flag": "img/flags/costa-de-marfil.png"},
+    {"name": "Ecuador", "ranking": 24, "flag": "img/flags/ecuador.png"}
     ],
 
 "Grupo F": [
-    {"name": "Países Bajos", "ranking": 7},
-    {"name": "Japón", "ranking": 17},
-    {"name": "Suecia", "ranking": 28},
-    {"name": "Túnez", "ranking": 49}
+    {"name": "Países Bajos", "ranking": 7, "flag": "img/flags/paises-bajos.png"},
+    {"name": "Japón", "ranking": 17, "flag": "img/flags/japon.png"},
+    {"name": "Suecia", "ranking": 28, "flag": "img/flags/suecia.png"},
+    {"name": "Túnez", "ranking": 49, "flag": "img/flags/tunez.png"}
     ],
 
 "Grupo G": [
-    {"name": "Bélgica", "ranking": 8},
-    {"name": "Egipto", "ranking": 36},
-    {"name": "Irán", "ranking": 20},
-    {"name": "Nueva Zelanda", "ranking": 94}
+    {"name": "Bélgica", "ranking": 8, "flag": "img/flags/belgica.png"},
+    {"name": "Egipto", "ranking": 36, "flag": "img/flags/egipto.png"},
+    {"name": "Irán", "ranking": 20, "flag": "img/flags/iran.png"},
+    {"name": "Nueva Zelanda", "ranking": 94, "flag": "img/flags/nueva-zelanda.png"}
     ],
 
 "Grupo H": [
-    {"name": "España", "ranking": 3},
-    {"name": "Cabo Verde", "ranking": 72},
-    {"name": "Arabia Saudita", "ranking": 58},
-    {"name": "Uruguay", "ranking": 13}
+    {"name": "España", "ranking": 3, "flag": "img/flags/Espana.png"},
+    {"name": "Cabo Verde", "ranking": 72, "flag": "img/flags/cabo-verde.png"},
+    {"name": "Arabia Saudita", "ranking": 58, "flag": "img/flags/arabia-saudita.png"},
+    {"name": "Uruguay", "ranking": 13, "flag": "img/flags/uruguay.png"}
     ],
 
 "Grupo I": [
-    {"name": "Francia", "ranking": 2},
-    {"name": "Senegal", "ranking": 18},
-    {"name": "Irak", "ranking": 58},
-    {"name": "Noruega", "ranking": 43}
+    {"name": "Francia", "ranking": 2, "flag": "img/flags/francia.png"},
+    {"name": "Senegal", "ranking": 18, "flag": "img/flags/senegal.png"},
+    {"name": "Irak", "ranking": 58, "flag": "img/flags/irak.png"},
+    {"name": "Noruega", "ranking": 43, "flag": "img/flags/noruega.png"}
 ],
 
 "Grupo J": [
-    {"name": "Argentina", "ranking": 1},
-    {"name": "Argelia", "ranking": 37},
-    {"name": "Austria", "ranking": 22},
-    {"name": "Jordania", "ranking": 64}
+    {"name": "Argentina", "ranking": 1, "flag": "img/flags/argentina.png"},
+    {"name": "Argelia", "ranking": 37, "flag": "img/flags/argelia.png"},
+    {"name": "Austria", "ranking": 22, "flag": "img/flags/austria.png"},
+    {"name": "Jordania", "ranking": 64, "flag": "img/flags/jordania.png"}
 ],
 
 "Grupo K": [
-    {"name": "Portugal", "ranking": 6},
-    {"name": "República Democrática del Congo", "ranking": 61},
-    {"name": "Uzbekistán", "ranking": 57},
-    {"name": "Colombia", "ranking": 14}
+    {"name": "Portugal", "ranking": 6, "flag": "img/flags/portugal.png"},
+    {"name": "República Democrática del Congo", "ranking": 61, "flag": "img/flags/rd-congo.png"},
+    {"name": "Uzbekistán", "ranking": 57, "flag": "img/flags/uzbekistan.png"},
+    {"name": "Colombia", "ranking": 14, "flag": "img/flags/colombia.png"}
 ],
 
 "Grupo L": [
-    {"name": "Inglaterra", "ranking": 4},
-    {"name": "Croacia", "ranking": 11},
-    {"name": "Ghana", "ranking": 76},
-    {"name": "Panamá", "ranking": 44}
+    {"name": "Inglaterra", "ranking": 4, "flag": "img/flags/inglaterra.png"},
+    {"name": "Croacia", "ranking": 11, "flag": "img/flags/croacia.png"},
+    {"name": "Ghana", "ranking": 76, "flag": "img/flags/ghana.png"},
+    {"name": "Panamá", "ranking": 44, "flag": "img/flags/panama.png"}
 ],
 }
 

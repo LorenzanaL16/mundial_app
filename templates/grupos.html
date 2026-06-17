@@ -15,16 +15,23 @@
         <table class="group-table">
 
             <tr>
+                <th>#</th>
                 <th>Equipo</th>
                 <th>Ranking FIFA</th>
             </tr>
 
             {% for equipo in equipos_grupo %}
-            <tr>
-                <td>{{ equipo.name }}</td>
-                <td>#{{ equipo.ranking }}</td>
-            </tr>
-            {% endfor %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <img src="{{ url_for('static', filename=equipo.flag) }}"
+                        alt="{{ equipo.name }}"
+                        width="25">
+                        {{ equipo.name }}
+                    </td>
+                    <td>#{{ equipo.ranking }}</td>
+                </tr>
+                {% endfor %}
 
         </table>
 
