@@ -15,18 +15,24 @@
             <span>{{ match.location }}</span>
         </div>
 
-        <div class="teams">
-
-            <div class="team">
-                <h3>{{ match.teamA }}</h3>
-                <p>ELO: {{ match.eloA }}</p>
-            </div>
+        <div class="team">
+            <img src="{{ url_for('static', filename=flags[match.teamA]) }}"
+            alt="{{ match.teamA }}"
+            class="fixture-flag">
+            
+            <h3>{{ match.teamA }}</h3>
+            <p>ELO: {{ match.eloA }}</p>
+        </div>
 
             <div class="vs">
                 VS
             </div>
 
             <div class="team">
+                <img src="{{ url_for('static', filename=flags[match.teamB]) }}"
+                alt="{{ match.teamB }}"
+                class="fixture-flag">
+                
                 <h3>{{ match.teamB }}</h3>
                 <p>ELO: {{ match.eloB }}</p>
             </div>

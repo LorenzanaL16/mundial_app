@@ -259,6 +259,33 @@ nav a:hover{
     vertical-align:middle;
 }
 
+.team-flag{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-bottom:15px;
+}
+
+.team-card h2{
+    margin-bottom:10px;
+}
+
+.team-card strong{
+    color:#0a84ff;
+}
+
+.team-card span{
+    display:inline-block;
+    margin-top:10px;
+    padding:6px 14px;
+    border-radius:20px;
+    background:#e8f1ff;
+    color:#0a84ff;
+    font-size:16px;
+    font-weight:bold;
+}
+
 /* =========================
    FIXTURE
 ========================= */
@@ -275,6 +302,14 @@ nav a:hover{
     gap:25px;
 }
 
+.fixture-flag{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-bottom:10px;
+}
+
 .match-card{
     background:white;
     border-radius:20px;
@@ -289,6 +324,10 @@ nav a:hover{
 
     color:#666;
     margin-bottom:20px;
+}
+
+.match-card:hover{
+    transform:translateY(-5px);
 }
 
 .teams{
@@ -312,6 +351,12 @@ nav a:hover{
     font-size:30px;
     font-weight:bold;
     color:#0f9b5f;
+}
+
+.vs{
+    font-size:28px;
+    font-weight:bold;
+    color:#0a84ff;
 }
 
 .probabilities{

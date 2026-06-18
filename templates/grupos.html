@@ -16,6 +16,7 @@
 
             <tr>
                 <th>#</th>
+                <th></th>
                 <th>Equipo</th>
                 <th>Ranking FIFA</th>
             </tr>
@@ -24,13 +25,14 @@
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td>
-                        <img src="{{ url_for('static', filename=equipo.flag) }}"
-                        alt="{{ equipo.name }}"
-                        width="25">
-                        {{ equipo.name }}
-                    </td>
-                    <td>#{{ equipo.ranking }}</td>
-                </tr>
+                        <div class="team-cell">
+                    <img src="{{ url_for('static', filename=equipo.flag) }}"
+                    alt="{{ equipo.name }}"
+                    width="25">
+                </td>
+                <td>{{ equipo.name }}</td>
+                <td>#{{ equipo.ranking }}</td>
+            </tr>
                 {% endfor %}
 
         </table>

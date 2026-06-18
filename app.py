@@ -71,7 +71,7 @@ grupos = {
     ],
 
 "Grupo H": [
-    {"name": "España", "ranking": 3, "flag": "img/flags/Espana.png"},
+    {"name": "España", "ranking": 3, "flag": "img/flags/espana.png"},
     {"name": "Cabo Verde", "ranking": 72, "flag": "img/flags/cabo-verde.png"},
     {"name": "Arabia Saudita", "ranking": 58, "flag": "img/flags/arabia-saudita.png"},
     {"name": "Uruguay", "ranking": 13, "flag": "img/flags/uruguay.png"}
@@ -113,6 +113,11 @@ for grupo, lista in grupos.items():
         equipo["group"] = grupo
         equipos.append(equipo)
 
+flags = {}
+
+for equipo in equipos:
+    flags[equipo["name"]] = equipo["flag"]
+
 # =========================
 # RUTAS
 # =========================
@@ -132,7 +137,8 @@ def grupos_view():
 def fixture():
     return render_template(
         "fixture.html",
-        matches=matches
+        matches=matches,
+        flags=flags
     )
 
 @app.route("/equipos")
