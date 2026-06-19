@@ -10,14 +10,7 @@
         Asistente Inteligente FIFA World Cup 2026
     </div>
 
-    <div class="chat-messages">
-
-        {% if respuesta %}
-        <div class="bot-message">
-            <strong>IA:</strong>
-            {{ respuesta }}
-        </div>
-        {% endif %}
+    <div id="chat" class="chat-messages">
 
         <div class="bot-message">
             <strong>IA:</strong>
@@ -34,6 +27,8 @@
         <button onclick="enviarMensaje()">
             Enviar
         </button>
+
+        <button onclick="nuevoChat()">🆕 Nuevo chat</button>
 
     </div>
 
@@ -78,6 +73,110 @@ async function enviarMensaje() {
     // scroll automático
     chat.scrollTop = chat.scrollHeight;
 }
+
+document.getElementById("pregunta").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        enviarMensaje();
+    }
+});
+
+</script>
+
+<script>
+
+let historial = JSON.parse(localStorage.getItem("chat_historial")) || [];
+
+function renderHistorial() {
+    let chat = document.querySelector(".chat-messages");
+    chat.innerHTML = "";
+
+    historial.forEach(msg => {
+
+        let div = document.createElement("div");
+
+        if (msg.tipo === "usuario") {
+            div.className = "user-message";
+            div.innerHTML = "<strong>Tú:</strong> " + msg.mensaje;
+        } else {
+            div.className = "bot-message";
+            div.innerHTML = "<strong>IA:</strong> " + msg.mensaje;
+        }
+
+        chat.appendChild(div);
+    });
+}
+
+async function enviarMensaje() {
+
+    let input = document.getElementById("pregunta");
+    let mensaje = input.value;
+
+    if (mensaje.trim() === "") return;
+
+    // guardar usuario
+    historial.push({ tipo: "usuario", mensaje: mensaje });
+
+    renderHistorial();
+
+    input.value = "";
+
+    let response = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ pregunta: mensaje })
+    });
+
+    let data = await response.json();
+
+    // guardar bot
+    historial.push({ tipo: "bot", mensaje: data.respuesta });
+
+    renderHistorial();
+
+    localStorage.setItem("chat_historial", JSON.stringify(historial));
+
+    document.querySelector(".chat-messages").scrollTop =
+        document.querySelector(".chat-messages").scrollHeight;
+}
+
+document.getElementById("pregunta").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        enviarMensaje();
+    }
+});
+
+renderHistorial();
+
+function nuevoChat() {
+    let chat = document.querySelector(".chat-messages");
+    let input = document.getElementById("pregunta");
+
+    chat.innerHTML = `
+        <div class="bot-message">
+            <strong>IA:</strong> Nuevo chat iniciado 👋. Pregúntame sobre el Mundial 2026.
+        </div>
+    `;
+
+    input.value = "";
+    input.focus();
+}
+
+window.onload = function () {
+
+    let chat = document.querySelector(".chat-messages");
+    
+    chat.innerHTML = `
+        <div class="bot-message">
+            <strong>IA:</strong> Hola 👋. Soy el asistente del Mundial 2026.
+
+        </div>
+    `;
+};
+
 </script>
 
 {% endblock %}

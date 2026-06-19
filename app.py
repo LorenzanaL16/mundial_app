@@ -121,73 +121,113 @@ grupos = {
 # =========================
 # INTENCIONES
 # =========================
+
 def detectar_intencion(p):
-    if any(x in p for x in ["cuando", "cuándo", "juega", "partido", "fixture"]):
+
+    if any(x in p for x in ["cuando juega", "cuándo juega", "partido", "fixture"]):
         return "fixture"
-    if "grupo" in p:
+
+    if any(x in p for x in ["grupo"]):
         return "grupo"
-    if "ranking" in p:
+
+    if any(x in p for x in ["ranking"]):
         return "ranking"
-    if "favorito" in p:
+
+    if any(x in p for x in ["favorito", "ganara", "ganará"]):
         return "favorito"
+
     return "general"
-
-equipos = []
-
-for grupo, lista in grupos.items():
-    for equipo in lista:
-        equipo["group"] = grupo
-        equipos.append(equipo)
-
-flags = {}
-
-for equipo in equipos:
-    flags[equipo["name"]] = equipo["flag"]
 
 def responder_chatbot(pregunta):
 
-    p = pregunta.lower()
+    p = normalizar(pregunta)
 
-    # equipos
-    if "cuántos equipos" in p or "cuantos equipos" in p:
-        return "El Mundial 2026 tiene 48 equipos participantes."
+    intent = detectar_intencion(p)
 
-    # ranking por equipo
-    if "ranking" in p:
+ # =========================
+    # FIXTURE / PARTIDOS
+    # =========================
+    if intent == "fixture":
+
+        for match in matches:
+            if match["teamA"].lower() in p or match["teamB"].lower() in p:
+
+                return (
+                    f"📅 El partido {match['teamA']} vs {match['teamB']} "
+                    f"se jugará el {match['date']} en {match['location']}. "
+                    f"⚽ Según el modelo: {match['teamA']} {match['probWinA']}% | "
+                    f"Empate {match['probDraw']}% | {match['teamB']} {match['probWinB']}%"
+                )
+
+        return "No encontré ese partido en el fixture, pero puedo mostrarte los juegos disponibles."
+    
+    # =========================
+    # EQUIPOS
+    # =========================
+    if intent == "general":
+        if "cuantos equipos" in p:
+            return "El Mundial 2026 tendrá 48 equipos participantes."
+
+    # =========================
+    # RANKING
+    # =========================
+    if intent == "ranking":
         for equipo in equipos:
-            if equipo["name"].lower() in p:
+            nombre = normalizar(equipo["name"])
+            if nombre in p:
                 return f"{equipo['name']} está en el ranking FIFA #{equipo['ranking']}."
         return "Dime el nombre de un equipo para darte su ranking."
 
-    # grupos
-    if "grupo" in p:
+    # =========================
+    # GRUPOS
+    # =========================
+    if intent == "grupo":
         for grupo, lista in grupos.items():
             for equipo in lista:
-                if equipo["name"].lower() in p:
+                nombre = normalizar(equipo["name"])
+                if nombre in p:
                     return f"{equipo['name']} pertenece al {grupo}."
 
-    # cuándo juega (FIX CORRECTO)
-    if "cuándo juega" in p or "cuando juega" in p:
+        return "Dime un equipo para decirte su grupo."
+
+    # =====================
+    # FIXTURE
+    # =====================
+    if intent == "fixture":
         for match in matches:
-            if match["teamA"].lower() in p or match["teamB"].lower() in p:
+            if normalizar(match["teamA"]) in p or normalizar(match["teamB"]) in p:
                 return f"{match['teamA']} vs {match['teamB']} juega el {match['date']} en {match['location']}."
 
         return "No tengo información de ese partido en el fixture."
 
-    # favorito
-    if "favorito" in p:
-        return "Argentina es el principal favorito según el modelo de predicción."
+    # =========================
+    # FAVORITO
+    # =========================
+    if intent == "favorito":
+        return "Argentina, Brasil y Francia son los principales favoritos según el modelo."
+    
+      # =========================
+    # GENERAL (IA STYLE)
+    # =========================
+    return (
+        "🤖 No estoy seguro de eso todavía.\n\n"
+        "Puedes preguntarme sobre:\n"
+        "• Partidos del Mundial (fixture)\n"
+        "• Grupos\n"
+        "• Ranking FIFA\n"
+        "• Favoritos del torneo"
+    )
 
-    # precisión
+    # =========================
+    # PRECISIÓN
+    # =========================
     if "accuracy" in p or "preciso" in p:
         return "El modelo tiene 58.4% accuracy y 55.1% F1-score."
 
-    # historial
-    if "historial" in p:
-        return "España vs Alemania: 3 victorias España, 2 Alemania, 1 empate."
-
-    return "Lo siento, no entendí tu pregunta. Intenta preguntar sobre equipos, grupos o partidos."
-
+    # =========================
+    # DEFAULT
+    # =========================
+    return "No entendí tu pregunta 🤔. Puedes preguntarme sobre equipos, grupos, partidos o rankings del Mundial 2026."
 # =========================
 # RUTAS WEB
 # =========================
