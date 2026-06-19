@@ -1,6 +1,18 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
+import re
+import unicodedata
 
 app = Flask(__name__)
+
+# =========================
+# NORMALIZAR
+# =========================
+def normalizar(texto):
+    texto = texto.lower()
+    texto = unicodedata.normalize('NFD', texto)
+    texto = ''.join(c for c in texto if unicodedata.category(c) != 'Mn')
+    texto = re.sub(r"[¿?¡!.,]", "", texto)
+    return texto
 
 # =========================
 # DATOS DE EJEMPLO
@@ -106,6 +118,20 @@ grupos = {
 ],
 }
 
+# =========================
+# INTENCIONES
+# =========================
+def detectar_intencion(p):
+    if any(x in p for x in ["cuando", "cuándo", "juega", "partido", "fixture"]):
+        return "fixture"
+    if "grupo" in p:
+        return "grupo"
+    if "ranking" in p:
+        return "ranking"
+    if "favorito" in p:
+        return "favorito"
+    return "general"
+
 equipos = []
 
 for grupo, lista in grupos.items():
@@ -118,43 +144,94 @@ flags = {}
 for equipo in equipos:
     flags[equipo["name"]] = equipo["flag"]
 
-# =========================
-# RUTAS
-# =========================
+def responder_chatbot(pregunta):
 
-@app.route("/")
-def inicio():
-    return render_template("inicio.html")
+    p = pregunta.lower()
+
+    # equipos
+    if "cuántos equipos" in p or "cuantos equipos" in p:
+        return "El Mundial 2026 tiene 48 equipos participantes."
+
+    # ranking por equipo
+    if "ranking" in p:
+        for equipo in equipos:
+            if equipo["name"].lower() in p:
+                return f"{equipo['name']} está en el ranking FIFA #{equipo['ranking']}."
+        return "Dime el nombre de un equipo para darte su ranking."
+
+    # grupos
+    if "grupo" in p:
+        for grupo, lista in grupos.items():
+            for equipo in lista:
+                if equipo["name"].lower() in p:
+                    return f"{equipo['name']} pertenece al {grupo}."
+
+    # cuándo juega (FIX CORRECTO)
+    if "cuándo juega" in p or "cuando juega" in p:
+        for match in matches:
+            if match["teamA"].lower() in p or match["teamB"].lower() in p:
+                return f"{match['teamA']} vs {match['teamB']} juega el {match['date']} en {match['location']}."
+
+        return "No tengo información de ese partido en el fixture."
+
+    # favorito
+    if "favorito" in p:
+        return "Argentina es el principal favorito según el modelo de predicción."
+
+    # precisión
+    if "accuracy" in p or "preciso" in p:
+        return "El modelo tiene 58.4% accuracy y 55.1% F1-score."
+
+    # historial
+    if "historial" in p:
+        return "España vs Alemania: 3 victorias España, 2 Alemania, 1 empate."
+
+    return "Lo siento, no entendí tu pregunta. Intenta preguntar sobre equipos, grupos o partidos."
+
+# =========================
+# RUTAS WEB
+# =========================
 
 @app.route("/grupos")
 def grupos_view():
-    return render_template(
-        "grupos.html",
-        grupos=grupos
-    )
+    return render_template("grupos.html", grupos=grupos)
 
 @app.route("/fixture")
 def fixture():
-    return render_template(
-        "fixture.html",
-        matches=matches,
-        flags=flags
-    )
+    return render_template("fixture.html", matches=matches, flags=flags)
 
 @app.route("/equipos")
 def equipos_view():
-    return render_template(
-        "equipos.html",
-        equipos=equipos
-    )
+    return render_template("equipos.html", equipos=equipos)
 
 @app.route("/predicciones")
 def predicciones():
     return render_template("predicciones.html")
 
-@app.route("/chatbot")
-def chatbot():
+@app.route("/")
+def inicio():
+    return render_template("inicio.html")
+
+@app.route("/chatbot", methods=["GET"])
+def chatbot_page():
     return render_template("chatbot.html")
+
+# =========================
+# API (TIEMPO REAL)
+# =========================
+
+@app.route("/api/chatbot", methods=["POST"])
+def api_chatbot():
+    data = request.get_json()
+    pregunta = data.get("pregunta", "")
+
+    respuesta = responder_chatbot(pregunta)
+
+    return jsonify({"respuesta": respuesta})
+
+# =========================
+# RUN
+# =========================
 
 if __name__ == "__main__":
     app.run(debug=True)

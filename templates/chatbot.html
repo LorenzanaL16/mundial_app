@@ -12,37 +12,72 @@
 
     <div class="chat-messages">
 
+        {% if respuesta %}
+        <div class="bot-message">
+            <strong>IA:</strong>
+            {{ respuesta }}
+        </div>
+        {% endif %}
+
         <div class="bot-message">
             <strong>IA:</strong>
             Hola 👋. Soy el asistente del Predictor Mundial 2026.
-            Pregúntame sobre equipos, grupos, rankings FIFA o predicciones.
-        </div>
-
-        <div class="user-message">
-            <strong>Tú:</strong>
-            ¿Quién es favorito para ganar el Mundial?
-        </div>
-
-        <div class="bot-message">
-            <strong>IA:</strong>
-            Según el modelo actual, Argentina, Francia y Brasil son los principales candidatos.
         </div>
 
     </div>
 
+    <!-- INPUT REAL TIME -->
     <div class="chat-input-area">
 
-        <input
-            type="text"
-            placeholder="Escribe tu pregunta..."
-        >
+        <input type="text" id="pregunta" placeholder="Escribe tu pregunta..." required>
 
-        <button>
+        <button onclick="enviarMensaje()">
             Enviar
         </button>
 
     </div>
 
 </div>
+
+<!-- JAVASCRIPT -->
+<script>
+async function enviarMensaje() {
+
+    let input = document.getElementById("pregunta");
+    let mensaje = input.value;
+
+    if (mensaje.trim() === "") return;
+
+    let chat = document.querySelector(".chat-messages");
+
+    // mensaje usuario
+    let userDiv = document.createElement("div");
+    userDiv.className = "user-message";
+    userDiv.innerHTML = "<strong>Tú:</strong> " + mensaje;
+    chat.appendChild(userDiv);
+
+    input.value = "";
+
+    // backend
+    let response = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ pregunta: mensaje })
+    });
+
+    let data = await response.json();
+
+    // respuesta bot
+    let botDiv = document.createElement("div");
+    botDiv.className = "bot-message";
+    botDiv.innerHTML = "<strong>IA:</strong> " + data.respuesta;
+    chat.appendChild(botDiv);
+
+    // scroll automático
+    chat.scrollTop = chat.scrollHeight;
+}
+</script>
 
 {% endblock %}
