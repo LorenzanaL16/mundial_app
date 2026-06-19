@@ -18,8 +18,7 @@ def normalizar(texto):
 # DATOS DE EJEMPLO
 # =========================
 
-matches = [
-    {
+matches.append({
         "date": "15 Junio 2026",
         "location": "Los Ángeles",
         "teamA": "México",
@@ -30,7 +29,19 @@ matches = [
         "probDraw": 25.1,
         "probWinB": 39.5
     }
-]
+)
+
+matches.append({
+    "date": "20 Junio 2026",
+    "location": "Dallas",
+    "teamA": "México",
+    "teamB": "Corea del Sur",
+    "eloA": 1800,
+    "eloB": 1750,
+    "probWinA": 40,
+    "probDraw": 30,
+    "probWinB": 30
+})
 
 grupos = {
     "Grupo A": [
@@ -118,6 +129,162 @@ grupos = {
 ],
 }
 
+equipos = []
+
+for grupo, lista in grupos.items():
+    for equipo in lista:
+        equipo["group"] = grupo
+        equipos.append(equipo)
+
+matches = []
+
+for grupo, equipos_lista in grupos.items():
+
+    # generamos todos contra todos dentro del grupo
+    for i in range(len(equipos_lista)):
+        for j in range(i + 1, len(equipos_lista)):
+
+            equipoA = equipos_lista[i]
+            equipoB = equipos_lista[j]
+
+            # simulación simple de ELO (puedes mejorar luego)
+            eloA = equipoA["ranking"] * 10
+            eloB = equipoB["ranking"] * 10
+
+            probA = round(50 + (eloB - eloA) * 0.05, 1)
+            probB = round(50 + (eloA - eloB) * 0.05, 1)
+
+            # evitar valores negativos
+            probA = max(5, min(90, probA))
+            probB = max(5, min(90, probB))
+            probDraw = round(100 - (probA + probB), 1)
+
+            matches.append({
+                "date": "Fase de grupos 2026",
+                "location": "Por definir",
+                "teamA": equipoA["name"],
+                "teamB": equipoB["name"],
+                "eloA": eloA,
+                "eloB": eloB,
+                "probWinA": probA,
+                "probDraw": probDraw,
+                "probWinB": probB
+            })
+
+flags = {}
+
+for equipo in equipos:
+    flags[equipo["name"]] = equipo["flag"]
+
+def calcular_clasificacion():
+    tabla = {}
+
+    # inicializar estructura
+    for grupo, equipos_lista in grupos.items():
+        tabla[grupo] = {}
+
+        for equipo in equipos_lista:
+            tabla[grupo][equipo["name"]] = {
+                "puntos": 0,
+                "gf": 0,
+                "gc": 0,
+                "diferencia": 0
+            }
+            
+    fechas_jornadas = {
+            1: "15 Junio 2026",
+            2: "20 Junio 2026",
+            3: "25 Junio 2026"
+        }
+
+    # simular partidos del fixture
+    matches = []
+
+for grupo, equipos_lista in grupos.items():
+
+    # Jornada 1, 2, 3 (rotación tipo FIFA)
+    jornada = 1
+
+    for i in range(len(equipos_lista)):
+        for j in range(i + 1, len(equipos_lista)):
+
+            equipoA = equipos_lista[i]
+            equipoB = equipos_lista[j]
+
+            eloA = equipoA["ranking"] * 10
+            eloB = equipoB["ranking"] * 10
+
+            probA = round(50 + (eloB - eloA) * 0.05, 1)
+            probB = round(50 + (eloA - eloB) * 0.05, 1)
+            probA = max(5, min(90, probA))
+            probB = max(5, min(90, probB))
+            probD = round(100 - (probA + probB), 1)
+
+            matches.append({
+                "date": fechas_jornadas[jornada],
+                "location": "Sede Mundial 2026",
+                "teamA": equipoA["name"],
+                "teamB": equipoB["name"],
+                "eloA": eloA,
+                "eloB": eloB,
+                "probWinA": probA,
+                "probDraw": probD,
+                "probWinB": probB
+            })
+
+            # avanzar jornada (1 → 2 → 3)
+            jornada += 1
+            if jornada > 3:
+                jornada = 1
+
+import random
+
+def simular_partido(match):
+    
+    probA = match["probWinA"]
+    probB = match["probWinB"]
+    probD = match["probDraw"]
+
+    # generar goles base
+    golesA = random.randint(0, 3)
+    golesB = random.randint(0, 3)
+
+    # ajustar con probabilidad
+    if probA > probB:
+        golesA += 1
+    elif probB > probA:
+        golesB += 1
+    else:
+        if random.random() > 0.5:
+            golesA += 1
+        else:
+            golesB += 1
+
+    return golesA, golesB
+
+def clasificados_por_grupo():
+    tabla = calcular_clasificacion()
+    clasificados = {}
+
+    for grupo, equipos in tabla.items():
+
+        ordenados = sorted(
+            equipos.items(),
+            key=lambda x: (
+                x[1]["puntos"],
+                x[1]["diferencia"],
+                x[1]["gf"]
+            ),
+            reverse=True
+        )
+
+        clasificados[grupo] = {
+            "1ro": ordenados[0][0] if len(ordenados) > 0 else None,
+            "2do": ordenados[1][0] if len(ordenados) > 1 else None
+        }
+
+    return clasificados
+
 # =========================
 # INTENCIONES
 # =========================
@@ -144,23 +311,41 @@ def responder_chatbot(pregunta):
 
     intent = detectar_intencion(p)
 
- # =========================
-    # FIXTURE / PARTIDOS
+# =========================
+# CLASIFICACIÓN (NUEVO)
+# =========================
+    if "clasifican" in p or "clasifica" in p:
+        data = clasificados_por_grupo()
+        for grupo, equipos in data.items():
+            if grupo.lower() in p:
+                return f"Clasificados del {grupo}: {equipos['1ro']} y {equipos['2do']}"
+            return "Dime el grupo (A, B, C...) para darte los clasificados."
+
     # =========================
+    # CLASIFICACIÓN (NUEVO FIX)
+    # =========================
+    if "clasifican" in p or "clasifica" in p:
+        data = clasificados_por_grupo()
+
+        for grupo, equipos in data.items():
+            if grupo.lower() in p:
+                return f"Clasificados del {grupo}: {equipos['1ro']} y {equipos['2do']}"
+
+        return "Dime el grupo (A, B, C...) para darte los clasificados."
+
+
+    # ====================
+    # # FIXTURE
+    # # =====================
     if intent == "fixture":
-
         for match in matches:
-            if match["teamA"].lower() in p or match["teamB"].lower() in p:
-
+            if normalizar(match["teamA"]) in p or normalizar(match["teamB"]) in p:
                 return (
                     f"📅 El partido {match['teamA']} vs {match['teamB']} "
-                    f"se jugará el {match['date']} en {match['location']}. "
-                    f"⚽ Según el modelo: {match['teamA']} {match['probWinA']}% | "
-                    f"Empate {match['probDraw']}% | {match['teamB']} {match['probWinB']}%"
+                    f"se jugará el {match['date']} en {match['location']}."
                 )
+            return "No tengo información de ese partido en el fixture."
 
-        return "No encontré ese partido en el fixture, pero puedo mostrarte los juegos disponibles."
-    
     # =========================
     # EQUIPOS
     # =========================
@@ -190,23 +375,19 @@ def responder_chatbot(pregunta):
 
         return "Dime un equipo para decirte su grupo."
 
-    # =====================
-    # FIXTURE
-    # =====================
-    if intent == "fixture":
-        for match in matches:
-            if normalizar(match["teamA"]) in p or normalizar(match["teamB"]) in p:
-                return f"{match['teamA']} vs {match['teamB']} juega el {match['date']} en {match['location']}."
-
-        return "No tengo información de ese partido en el fixture."
-
     # =========================
     # FAVORITO
     # =========================
     if intent == "favorito":
         return "Argentina, Brasil y Francia son los principales favoritos según el modelo."
     
-      # =========================
+     # =========================
+    # PRECISIÓN
+    # =========================
+    if "accuracy" in p or "preciso" in p:
+        return "El modelo tiene 58.4% accuracy y 55.1% F1-score."
+
+    # =========================
     # GENERAL (IA STYLE)
     # =========================
     return (
@@ -218,16 +399,6 @@ def responder_chatbot(pregunta):
         "• Favoritos del torneo"
     )
 
-    # =========================
-    # PRECISIÓN
-    # =========================
-    if "accuracy" in p or "preciso" in p:
-        return "El modelo tiene 58.4% accuracy y 55.1% F1-score."
-
-    # =========================
-    # DEFAULT
-    # =========================
-    return "No entendí tu pregunta 🤔. Puedes preguntarme sobre equipos, grupos, partidos o rankings del Mundial 2026."
 # =========================
 # RUTAS WEB
 # =========================

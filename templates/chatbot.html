@@ -88,11 +88,19 @@ document.getElementById("pregunta").addEventListener("keydown", function(event) 
 let historial = JSON.parse(localStorage.getItem("chat_historial")) || [];
 
 function renderHistorial() {
-    let chat = document.querySelector(".chat-messages");
+    let chat = document.getElementById("chat");
     chat.innerHTML = "";
 
-    historial.forEach(msg => {
+    if (historial.length === 0) {
+        chat.innerHTML = `
+            <div class="bot-message">
+                <strong>IA:</strong> Hola 👋. Soy el asistente del Mundial 2026.
+            </div>
+        `;
+        return;
+    }
 
+    historial.forEach(msg => {
         let div = document.createElement("div");
 
         if (msg.tipo === "usuario") {
@@ -105,6 +113,8 @@ function renderHistorial() {
 
         chat.appendChild(div);
     });
+
+    chat.scrollTop = chat.scrollHeight;
 }
 
 async function enviarMensaje() {
@@ -114,9 +124,7 @@ async function enviarMensaje() {
 
     if (mensaje.trim() === "") return;
 
-    // guardar usuario
     historial.push({ tipo: "usuario", mensaje: mensaje });
-
     renderHistorial();
 
     input.value = "";
@@ -131,17 +139,20 @@ async function enviarMensaje() {
 
     let data = await response.json();
 
-    // guardar bot
     historial.push({ tipo: "bot", mensaje: data.respuesta });
-
-    renderHistorial();
 
     localStorage.setItem("chat_historial", JSON.stringify(historial));
 
-    document.querySelector(".chat-messages").scrollTop =
-        document.querySelector(".chat-messages").scrollHeight;
+    renderHistorial();
 }
 
+function nuevoChat() {
+    historial = [];
+    localStorage.removeItem("chat_historial");
+    renderHistorial();
+}
+
+// ENTER
 document.getElementById("pregunta").addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -149,33 +160,8 @@ document.getElementById("pregunta").addEventListener("keydown", function(event) 
     }
 });
 
+// cargar chat al iniciar
 renderHistorial();
-
-function nuevoChat() {
-    let chat = document.querySelector(".chat-messages");
-    let input = document.getElementById("pregunta");
-
-    chat.innerHTML = `
-        <div class="bot-message">
-            <strong>IA:</strong> Nuevo chat iniciado 👋. Pregúntame sobre el Mundial 2026.
-        </div>
-    `;
-
-    input.value = "";
-    input.focus();
-}
-
-window.onload = function () {
-
-    let chat = document.querySelector(".chat-messages");
-    
-    chat.innerHTML = `
-        <div class="bot-message">
-            <strong>IA:</strong> Hola 👋. Soy el asistente del Mundial 2026.
-
-        </div>
-    `;
-};
 
 </script>
 
