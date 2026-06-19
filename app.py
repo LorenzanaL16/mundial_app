@@ -18,31 +18,6 @@ def normalizar(texto):
 # DATOS DE EJEMPLO
 # =========================
 
-matches.append({
-        "date": "15 Junio 2026",
-        "location": "Los Ángeles",
-        "teamA": "México",
-        "teamB": "Argentina",
-        "eloA": 1800,
-        "eloB": 1900,
-        "probWinA": 35.4,
-        "probDraw": 25.1,
-        "probWinB": 39.5
-    }
-)
-
-matches.append({
-    "date": "20 Junio 2026",
-    "location": "Dallas",
-    "teamA": "México",
-    "teamB": "Corea del Sur",
-    "eloA": 1800,
-    "eloB": 1750,
-    "probWinA": 40,
-    "probDraw": 30,
-    "probWinB": 30
-})
-
 grupos = {
     "Grupo A": [
         {"name": "México", "ranking": 15,"flag": "img/flags/mexico.png"},
@@ -138,39 +113,43 @@ for grupo, lista in grupos.items():
 
 matches = []
 
+fechas = ["15 Junio 2026", "20 Junio 2026", "25 Junio 2026"]
+
 for grupo, equipos_lista in grupos.items():
 
-    # generamos todos contra todos dentro del grupo
-    for i in range(len(equipos_lista)):
-        for j in range(i + 1, len(equipos_lista)):
+    for jornada, pares in enumerate([
+        [(0,1), (2,3)],
+        [(0,2), (1,3)],
+        [(0,3), (1,2)]
+    ]):
+
+        for i, j in pares:
 
             equipoA = equipos_lista[i]
             equipoB = equipos_lista[j]
 
-            # simulación simple de ELO (puedes mejorar luego)
             eloA = equipoA["ranking"] * 10
             eloB = equipoB["ranking"] * 10
 
             probA = round(50 + (eloB - eloA) * 0.05, 1)
             probB = round(50 + (eloA - eloB) * 0.05, 1)
 
-            # evitar valores negativos
             probA = max(5, min(90, probA))
             probB = max(5, min(90, probB))
-            probDraw = round(100 - (probA + probB), 1)
+            probD = round(100 - (probA + probB), 1)
 
             matches.append({
-                "date": "Fase de grupos 2026",
-                "location": "Por definir",
+                "date": fechas[jornada],
+                "location": "Sede Mundial 2026",
                 "teamA": equipoA["name"],
                 "teamB": equipoB["name"],
                 "eloA": eloA,
                 "eloB": eloB,
                 "probWinA": probA,
-                "probDraw": probDraw,
+                "probDraw": probD,
                 "probWinB": probB
             })
-
+            
 flags = {}
 
 for equipo in equipos:
@@ -179,7 +158,6 @@ for equipo in equipos:
 def calcular_clasificacion():
     tabla = {}
 
-    # inicializar estructura
     for grupo, equipos_lista in grupos.items():
         tabla[grupo] = {}
 
@@ -190,19 +168,17 @@ def calcular_clasificacion():
                 "gc": 0,
                 "diferencia": 0
             }
-            
-    fechas_jornadas = {
-            1: "15 Junio 2026",
-            2: "20 Junio 2026",
-            3: "25 Junio 2026"
-        }
+
+    return tabla
 
     # simular partidos del fixture
-    matches = []
+
+matches = []
+
+jornadas = {}
 
 for grupo, equipos_lista in grupos.items():
 
-    # Jornada 1, 2, 3 (rotación tipo FIFA)
     jornada = 1
 
     for i in range(len(equipos_lista)):
@@ -216,12 +192,13 @@ for grupo, equipos_lista in grupos.items():
 
             probA = round(50 + (eloB - eloA) * 0.05, 1)
             probB = round(50 + (eloA - eloB) * 0.05, 1)
+
             probA = max(5, min(90, probA))
             probB = max(5, min(90, probB))
             probD = round(100 - (probA + probB), 1)
 
             matches.append({
-                "date": fechas_jornadas[jornada],
+                "date": f"Jornada {jornada}",
                 "location": "Sede Mundial 2026",
                 "teamA": equipoA["name"],
                 "teamB": equipoB["name"],
@@ -232,24 +209,50 @@ for grupo, equipos_lista in grupos.items():
                 "probWinB": probB
             })
 
-            # avanzar jornada (1 → 2 → 3)
             jornada += 1
-            if jornada > 3:
-                jornada = 1
 
 import random
 
+# =========================
+# FIXTURE AUTOMÁTICO
+# =========================
+
+def generar_fixture():
+    matches = []
+
+    for grupo, equipos_lista in grupos.items():
+
+        jornada = 1
+
+        for i in range(len(equipos_lista)):
+            for j in range(i + 1, len(equipos_lista)):
+
+                equipoA = equipos_lista[i]
+                equipoB = equipos_lista[j]
+
+                matches.append({
+                    "grupo": grupo,
+                    "teamA": equipoA["name"],
+                    "teamB": equipoB["name"],
+                    "probWinA": random.randint(30, 60),
+                    "probWinB": random.randint(30, 60),
+                    "probDraw": random.randint(10, 30)
+                })
+
+    return matches
+
+# =========================
+# SIMULACIÓN
+# =========================
+
 def simular_partido(match):
-    
+
     probA = match["probWinA"]
     probB = match["probWinB"]
-    probD = match["probDraw"]
 
-    # generar goles base
     golesA = random.randint(0, 3)
     golesB = random.randint(0, 3)
 
-    # ajustar con probabilidad
     if probA > probB:
         golesA += 1
     elif probB > probA:
@@ -262,29 +265,161 @@ def simular_partido(match):
 
     return golesA, golesB
 
-def clasificados_por_grupo():
-    tabla = calcular_clasificacion()
-    clasificados = {}
 
-    for grupo, equipos in tabla.items():
+# =========================
+# CLASIFICACIÓN
+# =========================
 
-        ordenados = sorted(
-            equipos.items(),
-            key=lambda x: (
-                x[1]["puntos"],
-                x[1]["diferencia"],
-                x[1]["gf"]
-            ),
-            reverse=True
-        )
+def calcular_clasificacion():
 
-        clasificados[grupo] = {
-            "1ro": ordenados[0][0] if len(ordenados) > 0 else None,
-            "2do": ordenados[1][0] if len(ordenados) > 1 else None
-        }
+    tabla = {}
 
-    return clasificados
+    # inicializar tabla
+    for grupo, equipos_lista in grupos.items():
+        tabla[grupo] = {}
 
+    for equipo in equipos_lista:
+        tabla[grupo][equipo["name"]] = {
+                "puntos": 0,
+                "gf": 0,
+                "gc": 0,
+                "diferencia": 0,
+                "pj": 0
+            }
+
+    for match in matches:
+
+        grupo = match["grupo"]
+        teamA = match["teamA"]
+        teamB = match["teamB"]
+
+        golesA = random.randint(0, 3)
+        golesB = random.randint(0, 3)
+
+    # puntos
+        if golesA > golesB:
+            tabla[grupo][teamA]["puntos"] += 3
+        elif golesB > golesA:
+            tabla[grupo][teamB]["puntos"] += 3
+        else:
+            tabla[grupo][teamA]["puntos"] += 1
+            tabla[grupo][teamB]["puntos"] += 1
+
+    # PJ
+        tabla[grupo][teamA]["pj"] += 1
+        tabla[grupo][teamB]["pj"] += 1
+
+    # goles
+        tabla[grupo][teamA]["gf"] += golesA
+        tabla[grupo][teamA]["gc"] += golesB
+
+        tabla[grupo][teamB]["gf"] += golesB
+        tabla[grupo][teamB]["gc"] += golesA
+
+    # diferencia FINAL (FUERA del loop)
+        for grupo in tabla:
+            for equipo in tabla[grupo]:
+                t = tabla[grupo][equipo]
+                t["diferencia"] = t["gf"] - t["gc"]
+                return tabla
+
+    # =========================
+    # DIFERENCIA DE GOLES (CORRECTO)
+    # =========================
+
+    for grupo in tabla:
+        for equipo in tabla[grupo]:
+            t = tabla[grupo][equipo]
+            t["diferencia"] = t["gf"] - t["gc"]
+
+    return tabla
+# =========================
+# SIMULACIÓN DE PARTIDO
+# =========================
+
+def simular_partido(match):
+
+    probA = match["probWinA"]
+    probB = match["probWinB"]
+
+    golesA = random.randint(0, 3)
+    golesB = random.randint(0, 3)
+
+    # ajuste por probabilidad
+    if probA > probB:
+        golesA += 1
+    elif probB > probA:
+        golesB += 1
+    else:
+        if random.random() > 0.5:
+            golesA += 1
+        else:
+            golesB += 1
+
+    return golesA, golesB
+
+
+# =========================
+# CLASIFICACIÓN
+# =========================
+
+def calcular_clasificacion():
+
+    tabla = {}
+
+    # inicializar tabla
+    for grupo, equipos_lista in grupos.items():
+        tabla[grupo] = {}
+
+        for equipo in equipos_lista:
+            tabla[grupo][equipo["name"]] = {
+                "puntos": 0,
+                "gf": 0,
+                "gc": 0,
+                "diferencia": 0,
+                "pj": 0
+            }
+
+    # recorrer partidos
+    for match in matches:
+
+        teamA = match["teamA"]
+        teamB = match["teamB"]
+
+        for grupo, equipos_lista in grupos.items():
+
+            names = [e["name"] for e in equipos_lista]
+
+            if teamA in names and teamB in names:
+
+                golesA, golesB = simular_partido(match)
+
+                # partidos jugados
+                tabla[grupo][teamA]["pj"] += 1
+                tabla[grupo][teamB]["pj"] += 1
+
+                # puntos reales
+                if golesA > golesB:
+                    tabla[grupo][teamA]["puntos"] += 3
+                elif golesB > golesA:
+                    tabla[grupo][teamB]["puntos"] += 3
+                else:
+                    tabla[grupo][teamA]["puntos"] += 1
+                    tabla[grupo][teamB]["puntos"] += 1
+
+                # goles reales
+                tabla[grupo][teamA]["gf"] += golesA
+                tabla[grupo][teamA]["gc"] += golesB
+
+                tabla[grupo][teamB]["gf"] += golesB
+                tabla[grupo][teamB]["gc"] += golesA
+                
+                # diferencia de goles
+                for grupo in tabla:
+                    for equipo in tabla[grupo]:
+                        t = tabla[grupo][equipo]
+                        t["diferencia"] = t["gf"] - t["gc"]
+                        return tabla
 # =========================
 # INTENCIONES
 # =========================
@@ -344,7 +479,8 @@ def responder_chatbot(pregunta):
                     f"📅 El partido {match['teamA']} vs {match['teamB']} "
                     f"se jugará el {match['date']} en {match['location']}."
                 )
-            return "No tengo información de ese partido en el fixture."
+            
+        return "No tengo información de ese partido en el fixture."
 
     # =========================
     # EQUIPOS
@@ -426,6 +562,11 @@ def inicio():
 @app.route("/chatbot", methods=["GET"])
 def chatbot_page():
     return render_template("chatbot.html")
+    
+@app.route("/tabla")
+def tabla_view():
+    tabla = calcular_clasificacion()
+    return render_template("tabla.html", tabla=tabla)
 
 # =========================
 # API (TIEMPO REAL)

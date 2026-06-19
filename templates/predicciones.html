@@ -4,15 +4,25 @@
 
 <h1 class="page-title">📊 Predicciones IA</h1>
 
+<div class="fixture-container">
+
+{% for match in matches %}
+
 <div class="prediction-card">
 
     <div class="prediction-teams">
-    <img src="{{ url_for('static', filename='img/flags/mexico.png') }}" alt="México">
 
-    <h2>México vs Argentina</h2>
+        <img src="{{ url_for('static', filename=flags[match.teamA]) }}"
+             alt="{{ match.teamA }}"
+             class="fixture-flag">
 
-    <img src="{{ url_for('static', filename='img/flags/argentina.png') }}" alt="Argentina">
-</div>
+        <h2>{{ match.teamA }} vs {{ match.teamB }}</h2>
+
+        <img src="{{ url_for('static', filename=flags[match.teamB]) }}"
+             alt="{{ match.teamB }}"
+             class="fixture-flag">
+
+    </div>
 
     <p>
         Predicción basada en ranking FIFA y sistema ELO.
@@ -21,38 +31,25 @@
     <div class="prediction-grid">
 
         <div class="prediction-box">
-            <h3>35.4%</h3>
-            <span>Gana México</span>
+            <h3>{{ match.probWinA }}%</h3>
+            <span>Gana {{ match.teamA }}</span>
         </div>
 
         <div class="prediction-box">
-            <h3>25.1%</h3>
+            <h3>{{ match.probDraw }}%</h3>
             <span>Empate</span>
         </div>
 
         <div class="prediction-box">
-            <h3>39.5%</h3>
-            <span>Gana Argentina</span>
+            <h3>{{ match.probWinB }}%</h3>
+            <span>Gana {{ match.teamB }}</span>
         </div>
 
-    </div>
-    
-    <div class="prediction-bar">
-
-    <div class="win-a">
-        35.4%
-    </div>
-
-    <div class="draw">
-        25.1%
-    </div>
-
-    <div class="win-b">
-        39.5%
     </div>
 
 </div>
 
+{% endfor %}
 
 </div>
 
