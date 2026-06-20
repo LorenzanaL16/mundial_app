@@ -1,4 +1,4 @@
-# Predictor Mundial FIFA 2026
+# 🏆Predictor Mundial FIFA 2026
 
 Aplicación web desarrollada con Flask e Inteligencia Artificial para simular y analizar el Mundial FIFA 2026.
 
@@ -6,7 +6,7 @@ El sistema permite consultar grupos, equipos participantes, fixture, estadístic
 
 ---
 
-# Características
+# 🚀Características
 
 * Visualización de grupos del Mundial 2026.
 * Consulta de equipos participantes.
@@ -21,47 +21,57 @@ El sistema permite consultar grupos, equipos participantes, fixture, estadístic
 
 ---
 
-# Tecnologías utilizadas
-
-## Backend
-
-* Python
-* Flask
-* SQLite
-
-## Inteligencia Artificial
-
-* Scikit-Learn
-* Pandas
-* NumPy
-* Joblib
-
-## Frontend
-
-* HTML5
-* CSS3
-* JavaScript
-
-## Control de versiones
-
-* Git
-* GitHub
-
+# 🛠️Tecnologías utilizadas
 ---
 
-# Estructura del proyecto
+# Capturas de pantalla
 
-```text
-mundial_app/
-│
-├── app.py
-├── model.py
-├── model.pkl
-├── mundial.db
-├── results.csv
-│
-├── static/
-│   ├── css/
+Guarda las capturas de pantalla en la carpeta `screenshots/` y utiliza los siguientes nombres sugeridos:
+
+- `inicio.png`
+- `grupos.png`
+- `equipos.png`
+- `fixture.png`
+- `predicciones.png`
+- `estadisticas.png`
+- `chatbot.png`
+
+Luego agrega y sube las imágenes a GitHub:
+
+```bash
+git add screenshots/
+git commit -m "Agregar capturas de pantalla de la interfaz"
+git push origin master
+```
+
+Ejemplo de sección en el `README.md` para mostrar las imágenes:
+
+```markdown
+## Capturas de pantalla
+
+### Página principal
+![Inicio](screenshots/inicio.png)
+
+### Grupos
+![Grupos](screenshots/grupos.png)
+
+### Equipos
+![Equipos](screenshots/equipos.png)
+
+### Fixture
+![Fixture](screenshots/fixture.png)
+
+### Predicciones
+![Predicciones](screenshots/predicciones.png)
+
+### Estadísticas
+![Estadísticas](screenshots/estadisticas.png)
+
+### Chatbot
+![Chatbot](screenshots/chatbot.png)
+```
+
+---
 │   └── img/
 │
 ├── templates/
@@ -86,7 +96,7 @@ mundial_app/
 
 ---
 
-# Instalación
+# ⚙️Instalación
 
 ## 1. Clonar repositorio
 
@@ -150,18 +160,49 @@ El modelo genera predicciones de resultados que posteriormente son utilizadas pa
 
 # Capturas de pantalla
 
-Agregar imágenes de:
+## Capturas de pantalla
 
-* Página principal
-* Grupos
-* Fixture
-* Predicciones
-* Estadísticas
-* Chatbot
+### Página principal
+![Inicio](screenshots/inicio.png)
+
+### Grupos
+![Grupos](screenshots/grupos.png)
+
+### Equipos
+![Equipos](screenshots/equipos.png)
+
+### Fixture
+![Fixture](screenshots/fixture.png)
+
+Luego agrega y sube las imágenes a GitHub:
+
+```bash
+git add screenshots/
+git commit -m "Agregar capturas de pantalla de la interfaz"
+git push origin master
+```
+
+Para mostrar las capturas en el README, usa Markdown:
+
+```markdown
+## Capturas de pantalla
+
+### Página principal
+![Inicio](screenshots/inicio.png)
+
+### Grupos
+![Grupos](screenshots/grupos.png)
+
+### Predicciones
+![Predicciones](screenshots/predicciones.png)
+
+### Chatbot
+![Chatbot](screenshots/chatbot.png)
+```
 
 ---
 
-# Integrantes
+# 👥Integrantes
 
 * Jaquelin Natalia Lorenzana León
 * Salvador André Martínez Juárez
