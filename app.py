@@ -4,6 +4,8 @@ import unicodedata
 import sqlite3
 import io
 import csv
+import os
+import difflib
 from flask import Response
 
 app = Flask(__name__)
@@ -169,6 +171,33 @@ def buscar_equipo_por_nombre(nombre):
     return None
 
 
+def normalizar_texto(texto):
+    if texto is None:
+        return ""
+    texto = texto.lower()
+    texto = unicodedata.normalize('NFD', texto)
+    texto = ''.join(c for c in texto if unicodedata.category(c) != 'Mn')
+    texto = re.sub(r'[^a-z0-9 ]', '', texto)
+    texto = re.sub(r'\s+', ' ', texto).strip()
+    return texto
+
+
+def obtener_equipo_corregido(nombre):
+    if not nombre:
+        return None
+    equipo = buscar_equipo_por_nombre(nombre)
+    if equipo:
+        return equipo["name"]
+    nombre_norm = normalizar_texto(nombre)
+    opciones = {normalizar_texto(e["name"]): e["name"] for e in equipos}
+    if nombre_norm in opciones:
+        return opciones[nombre_norm]
+    matches = difflib.get_close_matches(nombre_norm, list(opciones.keys()), n=1, cutoff=0.6)
+    if matches:
+        return opciones[matches[0]]
+    return None
+
+
 def obtener_ganador_grupo(grupo):
     lista = grupos.get(grupo)
     if not lista:
@@ -183,6 +212,11 @@ def clasificados_por_grupo():
         orden = sorted(lista, key=lambda x: x["ranking"])
         resultado[grupo] = {"1ro": orden[0]["name"], "2do": orden[1]["name"]}
     return resultado
+
+
+def encontrar_partidos_por_equipo(nombre):
+    clave = normalizar(nombre)
+    return [m for m in matches if normalizar(m["teamA"]) == clave or normalizar(m["teamB"]) == clave]
 
 
 def mundiales_ganados(nombre):
@@ -369,6 +403,9 @@ def calcular_clasificacion():
 # =========================
 
 def detectar_intencion(p):
+    if any(x in p for x in ["probabilidad", "probabilidades", "chance", "tiene de", "tiene posibilidad", "posibilidad", "posibilidades", "porcentaje"]):
+        return "probabilidad"
+
     if any(x in p for x in ["cuando juega", "cuándo juega", "partido", "fixture", "fecha"]):
         return "fixture"
 
@@ -408,6 +445,66 @@ def responder_chatbot(pregunta):
             if normalizar(grupo) in p:
                 return f"Clasificados del {grupo}: {equipos_info['1ro']} y {equipos_info['2do']}"
         return "Dime el grupo (A, B, C, D, E, F, G, H, I, J, K, L) para darte los clasificados."
+
+    # =====================
+    # PROBABILIDADES DE PARTIDOS
+    # =====================
+    if intent == "probabilidad":
+        equipos_encontrados = [equipo for equipo in equipos if normalizar(equipo["name"]) in p]
+        if len(equipos_encontrados) == 2:
+            equipoA, equipoB = equipos_encontrados[0], equipos_encontrados[1]
+            match = next(
+                (
+                    m for m in matches
+                    if {normalizar(m["teamA"]), normalizar(m["teamB"])} == {normalizar(equipoA["name"]), normalizar(equipoB["name"]) }
+                ),
+                None
+            )
+            if match:
+                if "empate" in p:
+                    return (
+                        f"En el enfrentamiento {equipoA['name']} vs {equipoB['name']}, la probabilidad de empate es {match['probDraw']}%."
+                    )
+                probA = match['probWinA'] if normalizar(match['teamA']) == normalizar(equipoA['name']) else match['probWinB']
+                probB = match['probWinB'] if normalizar(match['teamB']) == normalizar(equipoB['name']) else match['probWinA']
+                return (
+                    f"En {equipoA['name']} vs {equipoB['name']}: \n"
+                    f"- {equipoA['name']}: {probA}% de ganar\n"
+                    f"- Empate: {match['probDraw']}%\n"
+                    f"- {equipoB['name']}: {probB}% de ganar"
+                )
+            return f"No hay un partido directo entre {equipoA['name']} y {equipoB['name']} en este fixture de grupo."
+
+        if len(equipos_encontrados) == 1:
+            equipo = equipos_encontrados[0]
+            partidos = encontrar_partidos_por_equipo(equipo["name"])
+            if partidos:
+                if "empate" in p and "gana" not in p and "ganar" not in p:
+                    promedio = sum(m["probDraw"] for m in partidos) / len(partidos)
+                    return f"{equipo['name']} tiene un {round(promedio, 1)}% de empate promedio en sus partidos de grupo."
+                if "pierde" in p or "perder" in p or "derrota" in p:
+                    promedio = sum(
+                        (m["probWinB"] if normalizar(m["teamA"]) == normalizar(equipo["name"]) else m["probWinA"])
+                        for m in partidos
+                    ) / len(partidos)
+                    return f"{equipo['name']} tiene un {round(promedio, 1)}% de probabilidad de perder en sus partidos de grupo."
+                if "gana" in p or "ganar" in p:
+                    promedio_ganar = sum(
+                        (m["probWinA"] if normalizar(m["teamA"]) == normalizar(equipo["name"]) else m["probWinB"])
+                        for m in partidos
+                    ) / len(partidos)
+                    return f"{equipo['name']} tiene un {round(promedio_ganar, 1)}% de probabilidad promedio de ganar sus partidos de grupo."
+                promedio_general = sum(
+                    (m["probWinA"] if normalizar(m["teamA"]) == normalizar(equipo["name"]) else m["probWinB"])
+                    for m in partidos
+                ) / len(partidos)
+                return f"{equipo['name']} tiene un {round(promedio_general, 1)}% de probabilidad promedio de ganar sus partidos de grupo."
+            return "No encuentro partidos registrados para ese equipo."
+
+        return (
+            "Dime qué equipos te interesan, por ejemplo '¿Qué probabilidad tiene Argentina de ganar?' "
+            "o '¿Cuál es la probabilidad de empate entre Argentina y México?'"
+        )
 
     # =====================
     # PREDICCIÓN (¿QUIÉN GANARÁ GRUPO X?)
@@ -521,6 +618,9 @@ def predicciones():
     min_prob = float(request.args.get('min_prob') or 0)
 
     matches_list = []
+    q_team_norm = normalizar_texto(q_team) if q_team else None
+    q_team_corregido = obtener_equipo_corregido(q_team) if q_team else None
+
     if os.path.exists(db):
         conn = sqlite3.connect(db)
         cur = conn.cursor()
@@ -530,14 +630,20 @@ def predicciones():
         if q_group:
             clauses.append('grupo = ?')
             params.append(q_group)
-        if q_team:
-            clauses.append('(teamA = ? OR teamB = ?)')
-            params.extend([q_team, q_team])
         if clauses:
             sql += ' WHERE ' + ' AND '.join(clauses)
         cur.execute(sql, params)
         for row in cur.fetchall():
-            mid, grupo, date, teamA, teamB, flagA, flagB, pA, pD, pB, predicted, ph, pa, source = row
+            mid, grupo, date, teamA_raw, teamB_raw, flagA, flagB, pA, pD, pB, predicted, ph, pa, source = row
+            teamA = obtener_equipo_corregido(teamA_raw) or teamA_raw
+            teamB = obtener_equipo_corregido(teamB_raw) or teamB_raw
+            if q_team_norm:
+                if q_team_corregido:
+                    if q_team_corregido not in (teamA, teamB):
+                        continue
+                else:
+                    if q_team_norm not in normalizar_texto(teamA_raw) and q_team_norm not in normalizar_texto(teamB_raw):
+                        continue
             pA = pA or 0
             pD = pD or 0
             pB = pB or 0
@@ -549,8 +655,8 @@ def predicciones():
                 'date': date,
                 'teamA': teamA,
                 'teamB': teamB,
-                'flagA': flagA,
-                'flagB': flagB,
+                'flagA': flagA or flags.get(teamA),
+                'flagB': flagB or flags.get(teamB),
                 'probWinA': round((pA or 0)*100,2),
                 'probDraw': round((pD or 0)*100,2),
                 'probWinB': round((pB or 0)*100,2),

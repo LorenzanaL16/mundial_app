@@ -768,6 +768,97 @@ nav a:hover{
     align-items: center;
 }
 
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+    width: 100%;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+}
+
+.filters label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-weight: 600;
+    color: #222;
+    min-width: 180px;
+}
+
+.filters input,
+.filters select {
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 15px;
+    width: 100%;
+    max-width: 260px;
+}
+
+.filters button {
+    background: #0f9b5f;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.prediction-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 380px;
+    width: 100%;
+    max-width: 900px;
+}
+
+.prediction-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 15px;
+}
+
+.prediction-box {
+    background: #f8fafd;
+    padding: 22px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 140px;
+    box-shadow: inset 0 0 0 1px rgba(15, 136, 255, .08);
+}
+
+.prediction-box h3 {
+    color: #0a84ff;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 900px) {
+    .prediction-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
 .match-card {
     background: #1f1f1f;
     color: white;
