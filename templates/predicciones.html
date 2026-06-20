@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "Base.html" %}
 
 {% block content %}
 
@@ -12,15 +12,15 @@
 
     <div class="prediction-teams">
 
-        <img src="{{ url_for('static', filename=flags[match.teamA]) }}"
-             alt="{{ match.teamA }}"
-             class="fixture-flag">
+           <img src="{{ url_for('static', filename=(match.flagA if match.flagA is defined else flags[match.teamA])) }}"
+               alt="{{ match.teamA }}"
+               class="fixture-flag">
 
         <h2>{{ match.teamA }} vs {{ match.teamB }}</h2>
 
-        <img src="{{ url_for('static', filename=flags[match.teamB]) }}"
-             alt="{{ match.teamB }}"
-             class="fixture-flag">
+           <img src="{{ url_for('static', filename=(match.flagB if match.flagB is defined else flags[match.teamB])) }}"
+               alt="{{ match.teamB }}"
+               class="fixture-flag">
 
     </div>
 

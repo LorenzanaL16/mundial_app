@@ -1,83 +1,77 @@
-{% extends "base.html" %}
+{% extends "Base.html" %}
 
 {% block content %}
+    <style>
+        body {
+            font-family: Arial;
+            background: #0b1d3a;
+            color: white;
+            padding: 20px;
+        }
 
-<style>
-    body {
-        font-family: Arial;
-        background: #0b1d3a;
-        color: white;
-        padding: 20px;
-    }
+        h1 {
+            text-align: center;
+            color: #f1c40f;
+        }
 
-    h1 {
-        text-align: center;
-        color: #f1c40f;
-    }
+        .grupo {
+            margin-top: 40px;
+            background: #12264a;
+            padding: 15px;
+            border-radius: 10px;
+        }
 
-    .grupo {
-        margin-top: 40px;
-        background: #12264a;
-        padding: 15px;
-        border-radius: 10px;
-    }
+        .grupo h2 {
+            color: #00d4ff;
+        }
 
-    .grupo h2 {
-        color: #00d4ff;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #2c3e50;
+        }
 
-    th, td {
-        padding: 10px;
-        text-align: center;
-        border-bottom: 1px solid #2c3e50;
-    }
+        th {
+            background: #1f3c88;
+        }
 
-    th {
-        background: #1f3c88;
-    }
+        tr:hover {
+            background: #1b335f;
+        }
+    </style>
 
-    tr:hover {
-        background: #1b335f;
-    }
-</style>
+    <h1>🏆 Tabla de Posiciones Mundial 2026</h1>
 
-<h1>🏆 Tabla de Posiciones Mundial 2026</h1>
+    {% for grupo, equipos in tabla.items() %}
+    <div class="grupo">
+        <h2>{{ grupo }}</h2>
 
-{% for grupo, equipos in tabla.items() %}
-
-<div class="grupo">
-    <h2>{{ grupo }}</h2>
-
-    <table>
-        <tr>
-            <th>Equipo</th>
-            <th>PTS</th>
-            <th>PJ</th>
-            <th>GF</th>
-            <th>GC</th>
-            <th>DG</th>
-        </tr>
-
-        {% for equipo, stats in equipos.items() %}
-        <tr>
-            <td>{{ equipo }}</td>
-            <td>{{ stats.puntos }}</td>
-            <td>{{ stats.pj }}</td>
-            <td>{{ stats.gf }}</td>
-            <td>{{ stats.gc }}</td>
-            <td>{{ stats.diferencia }}</td>
-        </tr>
-        {% endfor %}
-
-    </table>
-</div>
-
-{% endfor %}
-
+        <table>
+            <tr>
+                <th>Equipo</th>
+                <th>PTS</th>
+                <th>PJ</th>
+                <th>GF</th>
+                <th>GC</th>
+                <th>DG</th>
+            </tr>
+            {% for equipo, stats in equipos.items() %}
+            <tr>
+                <td>{{ equipo }}</td>
+                <td>{{ stats.pts }}</td>
+                <td>{{ stats.pj }}</td>
+                <td>{{ stats.gf }}</td>
+                <td>{{ stats.gc }}</td>
+                <td>{{ stats.dg }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endfor %}
 {% endblock %}

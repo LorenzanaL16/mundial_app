@@ -139,6 +139,7 @@ for grupo, equipos_lista in grupos.items():
             probD = round(100 - (probA + probB), 1)
 
             matches.append({
+                "grupo": grupo,
                 "date": fechas[jornada],
                 "location": "Sede Mundial 2026",
                 "teamA": equipoA["name"],
@@ -154,6 +155,194 @@ flags = {}
 
 for equipo in equipos:
     flags[equipo["name"]] = equipo["flag"]
+
+
+def buscar_equipo_por_nombre(nombre):
+    clave = normalizar(nombre)
+    for equipo in equipos:
+        if normalizar(equipo["name"]) == clave:
+            return equipo
+    return None
+
+
+def obtener_ganador_grupo(grupo):
+    lista = grupos.get(grupo)
+    if not lista:
+        return None
+    ganador = min(lista, key=lambda x: x["ranking"])
+    return ganador["name"]
+
+
+def clasificados_por_grupo():
+    resultado = {}
+    for grupo, lista in grupos.items():
+        orden = sorted(lista, key=lambda x: x["ranking"])
+        resultado[grupo] = {"1ro": orden[0]["name"], "2do": orden[1]["name"]}
+    return resultado
+
+
+def mundiales_ganados(nombre):
+    datos = {
+        "brasil": 5,
+        "alemania": 4,
+        "italia": 4,
+        "argentina": 3,
+        "uruguay": 2,
+        "francia": 2,
+        "inglaterra": 1,
+        "españa": 1,
+    }
+    equipo = buscar_equipo_por_nombre(nombre)
+    if equipo:
+        return datos.get(normalizar(equipo["name"]))
+    return datos.get(normalizar(nombre))
+
+
+def calcular_tabla_posiciones():
+    import random
+
+    tabla = {
+        grupo: {
+            equipo["name"]: {"pts": 0, "pj": 0, "gf": 0, "gc": 0, "dg": 0}
+            for equipo in lista
+        }
+        for grupo, lista in grupos.items()
+    }
+
+    matches_with_scores = []
+
+    for match in matches:
+        grupo = match.get("grupo")
+        if grupo not in tabla:
+            continue
+
+        local = match["teamA"]
+        visitante = match["teamB"]
+        probA = float(match.get("probWinA", 0) or 0)
+        probB = float(match.get("probWinB", 0) or 0)
+        probD = float(match.get("probDraw", 0) or 0)
+
+        total = probA + probB + probD
+        if total <= 0:
+            probA, probB, probD = 0.33, 0.33, 0.34
+        else:
+            probA /= total
+            probB /= total
+            probD /= total
+
+        seed = f"{local}-{visitante}-{probA:.4f}-{probB:.4f}-{probD:.4f}"
+        rnd = random.Random(seed)
+        r = rnd.random()
+
+        if r < probA:
+            gl = rnd.randint(2, 4)
+            gv = rnd.randint(1, gl - 1)
+        elif r < probA + probD:
+            gl = gv = rnd.randint(1, 3)
+        else:
+            gv = rnd.randint(2, 4)
+            gl = rnd.randint(1, gv - 1)
+
+        matches_with_scores.append({
+            "grupo": grupo,
+            "local": local,
+            "visitante": visitante,
+            "gl": gl,
+            "gv": gv
+        })
+
+    stats = {
+        grupo: {
+            equipo: {"pts": 0, "pj": 0, "gf": 0, "gc": 0, "dg": 0}
+            for equipo in equipos_grupo
+        }
+        for grupo, equipos_grupo in tabla.items()
+    }
+
+    def compute_stats():
+        for grupo, equipos_grupo in stats.items():
+            for equipo in equipos_grupo:
+                stats[grupo][equipo] = {"pts": 0, "pj": 0, "gf": 0, "gc": 0, "dg": 0}
+
+        for match_data in matches_with_scores:
+            grupo = match_data["grupo"]
+            local = match_data["local"]
+            visitante = match_data["visitante"]
+            gl = match_data["gl"]
+            gv = match_data["gv"]
+
+            if local not in stats[grupo]:
+                stats[grupo][local] = {"pts": 0, "pj": 0, "gf": 0, "gc": 0, "dg": 0}
+            if visitante not in stats[grupo]:
+                stats[grupo][visitante] = {"pts": 0, "pj": 0, "gf": 0, "gc": 0, "dg": 0}
+
+            stats[grupo][local]["pj"] += 1
+            stats[grupo][visitante]["pj"] += 1
+            stats[grupo][local]["gf"] += gl
+            stats[grupo][local]["gc"] += gv
+            stats[grupo][visitante]["gf"] += gv
+            stats[grupo][visitante]["gc"] += gl
+
+            if gl > gv:
+                stats[grupo][local]["pts"] += 3
+            elif gl < gv:
+                stats[grupo][visitante]["pts"] += 3
+            else:
+                stats[grupo][local]["pts"] += 1
+                stats[grupo][visitante]["pts"] += 1
+
+        for grupo, equipos_grupo in stats.items():
+            for equipo, equipo_stats in equipos_grupo.items():
+                equipo_stats["dg"] = equipo_stats["gf"] - equipo_stats["gc"]
+
+    compute_stats()
+
+    while True:
+        zero_teams = [
+            (grupo, equipo)
+            for grupo, equipos_grupo in stats.items()
+            for equipo, equipo_stats in equipos_grupo.items()
+            if equipo_stats["pts"] == 0 or equipo_stats["gf"] == 0
+        ]
+
+        if not zero_teams:
+            break
+
+        changed = False
+        for grupo, equipo in zero_teams:
+            for match_data in matches_with_scores:
+                if match_data["grupo"] != grupo:
+                    continue
+
+                if match_data["local"] == equipo and match_data["gl"] < match_data["gv"]:
+                    match_data["gl"] = 1
+                    match_data["gv"] = 1
+                    changed = True
+                    break
+                if match_data["visitante"] == equipo and match_data["gv"] < match_data["gl"]:
+                    match_data["gl"] = 1
+                    match_data["gv"] = 1
+                    changed = True
+                    break
+            if changed:
+                break
+
+        if not changed:
+            break
+
+        compute_stats()
+
+    tabla_result = {}
+    for grupo, equipos_grupo in stats.items():
+        tabla_result[grupo] = dict(
+            sorted(
+                equipos_grupo.items(),
+                key=lambda item: (item[1]["pts"], item[1]["dg"], item[1]["gf"]),
+                reverse=True
+            )
+        )
+
+    return tabla_result
 
 def calcular_clasificacion():
     tabla = {}
@@ -171,368 +360,136 @@ def calcular_clasificacion():
 
     return tabla
 
-    # simular partidos del fixture
-
-matches = []
-
-jornadas = {}
-
-for grupo, equipos_lista in grupos.items():
-
-    jornada = 1
-
-    for i in range(len(equipos_lista)):
-        for j in range(i + 1, len(equipos_lista)):
-
-            equipoA = equipos_lista[i]
-            equipoB = equipos_lista[j]
-
-            eloA = equipoA["ranking"] * 10
-            eloB = equipoB["ranking"] * 10
-
-            probA = round(50 + (eloB - eloA) * 0.05, 1)
-            probB = round(50 + (eloA - eloB) * 0.05, 1)
-
-            probA = max(5, min(90, probA))
-            probB = max(5, min(90, probB))
-            probD = round(100 - (probA + probB), 1)
-
-            matches.append({
-                "date": f"Jornada {jornada}",
-                "location": "Sede Mundial 2026",
-                "teamA": equipoA["name"],
-                "teamB": equipoB["name"],
-                "eloA": eloA,
-                "eloB": eloB,
-                "probWinA": probA,
-                "probDraw": probD,
-                "probWinB": probB
-            })
-
-            jornada += 1
-
-import random
-
-# =========================
-# FIXTURE AUTOMÁTICO
-# =========================
-
-def generar_fixture():
-    matches = []
-
-    for grupo, equipos_lista in grupos.items():
-
-        jornada = 1
-
-        for i in range(len(equipos_lista)):
-            for j in range(i + 1, len(equipos_lista)):
-
-                equipoA = equipos_lista[i]
-                equipoB = equipos_lista[j]
-
-                matches.append({
-                    "grupo": grupo,
-                    "teamA": equipoA["name"],
-                    "teamB": equipoB["name"],
-                    "probWinA": random.randint(30, 60),
-                    "probWinB": random.randint(30, 60),
-                    "probDraw": random.randint(10, 30)
-                })
-
-    return matches
-
-# =========================
-# SIMULACIÓN
-# =========================
-
-def simular_partido(match):
-
-    probA = match["probWinA"]
-    probB = match["probWinB"]
-
-    golesA = random.randint(0, 3)
-    golesB = random.randint(0, 3)
-
-    if probA > probB:
-        golesA += 1
-    elif probB > probA:
-        golesB += 1
-    else:
-        if random.random() > 0.5:
-            golesA += 1
-        else:
-            golesB += 1
-
-    return golesA, golesB
-
-
-# =========================
-# CLASIFICACIÓN
-# =========================
-
-def calcular_clasificacion():
-
-    tabla = {}
-
-    # inicializar tabla
-    for grupo, equipos_lista in grupos.items():
-        tabla[grupo] = {}
-
-    for equipo in equipos_lista:
-        tabla[grupo][equipo["name"]] = {
-                "puntos": 0,
-                "gf": 0,
-                "gc": 0,
-                "diferencia": 0,
-                "pj": 0
-            }
-
-    for match in matches:
-
-        grupo = match["grupo"]
-        teamA = match["teamA"]
-        teamB = match["teamB"]
-
-        golesA = random.randint(0, 3)
-        golesB = random.randint(0, 3)
-
-    # puntos
-        if golesA > golesB:
-            tabla[grupo][teamA]["puntos"] += 3
-        elif golesB > golesA:
-            tabla[grupo][teamB]["puntos"] += 3
-        else:
-            tabla[grupo][teamA]["puntos"] += 1
-            tabla[grupo][teamB]["puntos"] += 1
-
-    # PJ
-        tabla[grupo][teamA]["pj"] += 1
-        tabla[grupo][teamB]["pj"] += 1
-
-    # goles
-        tabla[grupo][teamA]["gf"] += golesA
-        tabla[grupo][teamA]["gc"] += golesB
-
-        tabla[grupo][teamB]["gf"] += golesB
-        tabla[grupo][teamB]["gc"] += golesA
-
-    # diferencia FINAL (FUERA del loop)
-        for grupo in tabla:
-            for equipo in tabla[grupo]:
-                t = tabla[grupo][equipo]
-                t["diferencia"] = t["gf"] - t["gc"]
-                return tabla
-
-    # =========================
-    # DIFERENCIA DE GOLES (CORRECTO)
-    # =========================
-
-    for grupo in tabla:
-        for equipo in tabla[grupo]:
-            t = tabla[grupo][equipo]
-            t["diferencia"] = t["gf"] - t["gc"]
-
-    return tabla
-# =========================
-# SIMULACIÓN DE PARTIDO
-# =========================
-
-def simular_partido(match):
-
-    probA = match["probWinA"]
-    probB = match["probWinB"]
-
-    golesA = random.randint(0, 3)
-    golesB = random.randint(0, 3)
-
-    # ajuste por probabilidad
-    if probA > probB:
-        golesA += 1
-    elif probB > probA:
-        golesB += 1
-    else:
-        if random.random() > 0.5:
-            golesA += 1
-        else:
-            golesB += 1
-
-    return golesA, golesB
-
-
-# =========================
-# CLASIFICACIÓN
-# =========================
-
-def calcular_clasificacion():
-
-    tabla = {}
-
-    # inicializar tabla
-    for grupo, equipos_lista in grupos.items():
-        tabla[grupo] = {}
-
-        for equipo in equipos_lista:
-            tabla[grupo][equipo["name"]] = {
-                "puntos": 0,
-                "gf": 0,
-                "gc": 0,
-                "diferencia": 0,
-                "pj": 0
-            }
-
-    # recorrer partidos
-    for match in matches:
-
-        teamA = match["teamA"]
-        teamB = match["teamB"]
-
-        for grupo, equipos_lista in grupos.items():
-
-            names = [e["name"] for e in equipos_lista]
-
-            if teamA in names and teamB in names:
-
-                golesA, golesB = simular_partido(match)
-
-                # partidos jugados
-                tabla[grupo][teamA]["pj"] += 1
-                tabla[grupo][teamB]["pj"] += 1
-
-                # puntos reales
-                if golesA > golesB:
-                    tabla[grupo][teamA]["puntos"] += 3
-                elif golesB > golesA:
-                    tabla[grupo][teamB]["puntos"] += 3
-                else:
-                    tabla[grupo][teamA]["puntos"] += 1
-                    tabla[grupo][teamB]["puntos"] += 1
-
-                # goles reales
-                tabla[grupo][teamA]["gf"] += golesA
-                tabla[grupo][teamA]["gc"] += golesB
-
-                tabla[grupo][teamB]["gf"] += golesB
-                tabla[grupo][teamB]["gc"] += golesA
-                
-                # diferencia de goles
-                for grupo in tabla:
-                    for equipo in tabla[grupo]:
-                        t = tabla[grupo][equipo]
-                        t["diferencia"] = t["gf"] - t["gc"]
-                        return tabla
 # =========================
 # INTENCIONES
 # =========================
 
 def detectar_intencion(p):
-
-    if any(x in p for x in ["cuando juega", "cuándo juega", "partido", "fixture"]):
+    if any(x in p for x in ["cuando juega", "cuándo juega", "partido", "fixture", "fecha"]):
         return "fixture"
+
+    if any(x in p for x in ["clasifican", "clasifica", "clasificados", "clasificado"]):
+        return "clasificacion"
+
+    if any(x in p for x in ["ganara", "ganará", "quien gana", "quien ganara", "quien ganará", "quien sera", "quien será"]):
+        return "prediccion"
+
+    if any(x in p for x in ["mundiales", "mundial ha ganado", "copas del mundo", "copas mundiales", "campeon mundial"]):
+        return "mundiales"
+
+    if any(x in p for x in ["ranking", "fifa"]):
+        return "ranking"
+
+    if any(x in p for x in ["favorito", "favoritos", "favorita", "mejor equipo"]):
+        return "favorito"
 
     if any(x in p for x in ["grupo"]):
         return "grupo"
 
-    if any(x in p for x in ["ranking"]):
-        return "ranking"
-
-    if any(x in p for x in ["favorito", "ganara", "ganará"]):
-        return "favorito"
+    if any(x in p for x in ["cuantos equipos", "participantes", "equipos participantes"]):
+        return "general"
 
     return "general"
 
 def responder_chatbot(pregunta):
-
     p = normalizar(pregunta)
-
     intent = detectar_intencion(p)
 
-# =========================
-# CLASIFICACIÓN (NUEVO)
-# =========================
-    if "clasifican" in p or "clasifica" in p:
+    # =====================
+    # CLASIFICACIÓN
+    # =====================
+    if intent == "clasificacion" or "clasifican" in p or "clasifica" in p:
         data = clasificados_por_grupo()
-        for grupo, equipos in data.items():
-            if grupo.lower() in p:
-                return f"Clasificados del {grupo}: {equipos['1ro']} y {equipos['2do']}"
-            return "Dime el grupo (A, B, C...) para darte los clasificados."
+        for grupo, equipos_info in data.items():
+            if normalizar(grupo) in p:
+                return f"Clasificados del {grupo}: {equipos_info['1ro']} y {equipos_info['2do']}"
+        return "Dime el grupo (A, B, C, D, E, F, G, H, I, J, K, L) para darte los clasificados."
 
-    # =========================
-    # CLASIFICACIÓN (NUEVO FIX)
-    # =========================
-    if "clasifican" in p or "clasifica" in p:
-        data = clasificados_por_grupo()
+    # =====================
+    # PREDICCIÓN (¿QUIÉN GANARÁ GRUPO X?)
+    # =====================
+    if intent == "prediccion":
+        for grupo in grupos:
+            if normalizar(grupo) in p:
+                ganador = obtener_ganador_grupo(grupo)
+                return f"Según el ranking actual, el favorito para ganar {grupo} es {ganador}."
+        if "mundial" in p or "campeon" in p:
+            return "Los favoritos del Mundial son Argentina, Brasil y Francia."
+        return "¿A qué grupo te refieres? (Grupo A, B, C, D, E, F, G, H, I, J, K, L)"
 
-        for grupo, equipos in data.items():
-            if grupo.lower() in p:
-                return f"Clasificados del {grupo}: {equipos['1ro']} y {equipos['2do']}"
+    # =====================
+    # MUNDIALES GANADOS
+    # =====================
+    if intent == "mundiales":
+        for equipo in equipos:
+            if normalizar(equipo["name"]) in p:
+                ganados = mundiales_ganados(equipo["name"])
+                if ganados is not None:
+                    return f"{equipo['name']} ha ganado {ganados} Copas del Mundo."
+        return "¿A qué equipo te refieres? (ej: Brasil, Argentina, Alemania)"
 
-        return "Dime el grupo (A, B, C...) para darte los clasificados."
-
-
-    # ====================
-    # # FIXTURE
-    # # =====================
+    # =====================
+    # FIXTURE (CUÁNDO JUEGA)
+    # =====================
     if intent == "fixture":
         for match in matches:
             if normalizar(match["teamA"]) in p or normalizar(match["teamB"]) in p:
+                location = match.get("location", "Sede Mundial 2026")
                 return (
                     f"📅 El partido {match['teamA']} vs {match['teamB']} "
-                    f"se jugará el {match['date']} en {match['location']}."
+                    f"se jugará el {match['date']} en {location}."
                 )
-            
-        return "No tengo información de ese partido en el fixture."
+        return "¿A qué equipo o partido te refieres?"
 
-    # =========================
-    # EQUIPOS
-    # =========================
-    if intent == "general":
-        if "cuantos equipos" in p:
-            return "El Mundial 2026 tendrá 48 equipos participantes."
-
-    # =========================
-    # RANKING
-    # =========================
+    # =====================
+    # RANKING FIFA
+    # =====================
     if intent == "ranking":
         for equipo in equipos:
-            nombre = normalizar(equipo["name"])
-            if nombre in p:
+            if normalizar(equipo["name"]) in p:
                 return f"{equipo['name']} está en el ranking FIFA #{equipo['ranking']}."
-        return "Dime el nombre de un equipo para darte su ranking."
+        return "¿A qué equipo te refieres?"
 
-    # =========================
-    # GRUPOS
-    # =========================
+    # =====================
+    # GRUPO
+    # =====================
     if intent == "grupo":
-        for grupo, lista in grupos.items():
-            for equipo in lista:
-                nombre = normalizar(equipo["name"])
-                if nombre in p:
-                    return f"{equipo['name']} pertenece al {grupo}."
+        for equipo in equipos:
+            if normalizar(equipo["name"]) in p:
+                return f"{equipo['name']} pertenece al {equipo['group']}."
+        return "¿A qué equipo te refieres?"
 
-        return "Dime un equipo para decirte su grupo."
-
-    # =========================
+    # =====================
     # FAVORITO
-    # =========================
+    # =====================
     if intent == "favorito":
         return "Argentina, Brasil y Francia son los principales favoritos según el modelo."
-    
-     # =========================
-    # PRECISIÓN
-    # =========================
-    if "accuracy" in p or "preciso" in p:
+
+    # =====================
+    # BÚSQUEDA GENÉRICA DE EQUIPO
+    # =====================
+    for equipo in equipos:
+        if normalizar(equipo["name"]) in p:
+            return f"{equipo['name']} pertenece al {equipo['group']} y tiene ranking FIFA #{equipo['ranking']}."
+
+    # =====================
+    # GENERAL
+    # =====================
+    if "cuantos equipos" in p or "equipos participantes" in p or "equipos hay" in p:
+        return "El Mundial 2026 tendrá 48 equipos participantes."
+
+    if "accuracy" in p or "preciso" in p or "precision" in p or "f1" in p:
         return "El modelo tiene 58.4% accuracy y 55.1% F1-score."
 
-    # =========================
-    # GENERAL (IA STYLE)
-    # =========================
     return (
         "🤖 No estoy seguro de eso todavía.\n\n"
         "Puedes preguntarme sobre:\n"
-        "• Partidos del Mundial (fixture)\n"
-        "• Grupos\n"
-        "• Ranking FIFA\n"
-        "• Favoritos del torneo"
+        "• ¿Quién ganará el Grupo A/B/C/...?\n"
+        "• ¿Cuántos mundiales ha ganado Brasil?\n"
+        "• ¿Cuál es el ranking de Argentina?\n"
+        "• ¿Qué equipos clasifican del Grupo C?\n"
+        "• ¿Cuándo juega Argentina?\n"
+        "• ¿Quién es favorito?"
     )
 
 # =========================
@@ -553,7 +510,7 @@ def equipos_view():
 
 @app.route("/predicciones")
 def predicciones():
-    return render_template("predicciones.html")
+    return render_template("predicciones.html", matches=matches, flags=flags)
 
 @app.route("/")
 def inicio():
@@ -562,11 +519,11 @@ def inicio():
 @app.route("/chatbot", methods=["GET"])
 def chatbot_page():
     return render_template("chatbot.html")
-    
+
 @app.route("/tabla")
-def tabla_view():
-    tabla = calcular_clasificacion()
-    return render_template("tabla.html", tabla=tabla)
+def tabla():
+    data = calcular_tabla_posiciones()
+    return render_template("tabla.html", tabla=data)
 
 # =========================
 # API (TIEMPO REAL)
