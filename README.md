@@ -22,6 +22,15 @@ El sistema permite consultar grupos, equipos participantes, fixture, estadístic
 ---
 
 # 🛠️Tecnologías utilizadas
+
+- **Lenguaje:** Python 3
+- **Backend:** Flask
+- **Base de datos:** SQLite
+- **Data:** pandas, numpy
+- **Machine Learning:** scikit-learn, joblib
+- **HTTP / Requests:** requests
+- **Frontend:** HTML5, CSS3, JavaScript
+
 ---
 
 # Capturas de pantalla
@@ -35,19 +44,6 @@ Guarda las capturas de pantalla en la carpeta `screenshots/` y utiliza los sigui
 - `predicciones.png`
 - `estadisticas.png`
 - `chatbot.png`
-
-Luego agrega y sube las imágenes a GitHub:
-
-```bash
-git add screenshots/
-git commit -m "Agregar capturas de pantalla de la interfaz"
-git push origin master
-```
-
-Ejemplo de sección en el `README.md` para mostrar las imágenes:
-
-```markdown
-## Capturas de pantalla
 
 ### Página principal
 ![Inicio](screenshots/inicio.png)
@@ -71,7 +67,16 @@ Ejemplo de sección en el `README.md` para mostrar las imágenes:
 ![Chatbot](screenshots/chatbot.png)
 ```
 
----
+mundial_app/
+│
+├── app.py
+├── model.py
+├── model.pkl
+├── mundial.db
+├── results.csv
+│
+├── static/
+│   ├── css/
 │   └── img/
 │
 ├── templates/
@@ -91,7 +96,18 @@ Ejemplo de sección en el `README.md` para mostrar las imágenes:
 ├── aplicar_predicciones_heuristicas.py
 ├── download_flags.py
 │
+├── DOCS.md
+├── requirements.txt
+├── screenshots/
+│   ├── inicio.png
+│   ├── grupos.png
+│   ├── fixture.png
+│   └── equipos.png
+│   ├── predicciones.png
+│   └── chatbot.png
+    └── tabla de posiciones.png   
 └── README.md
+
 ```
 
 ---
@@ -156,49 +172,6 @@ https://kaggle.com/datasets/martj42/international-football-results-from-1872-to-
 
 El modelo genera predicciones de resultados que posteriormente son utilizadas para construir tablas de posiciones y simulaciones del torneo.
 
----
-
-# Capturas de pantalla
-
-## Capturas de pantalla
-
-### Página principal
-![Inicio](screenshots/inicio.png)
-
-### Grupos
-![Grupos](screenshots/grupos.png)
-
-### Equipos
-![Equipos](screenshots/equipos.png)
-
-### Fixture
-![Fixture](screenshots/fixture.png)
-
-Luego agrega y sube las imágenes a GitHub:
-
-```bash
-git add screenshots/
-git commit -m "Agregar capturas de pantalla de la interfaz"
-git push origin master
-```
-
-Para mostrar las capturas en el README, usa Markdown:
-
-```markdown
-## Capturas de pantalla
-
-### Página principal
-![Inicio](screenshots/inicio.png)
-
-### Grupos
-![Grupos](screenshots/grupos.png)
-
-### Predicciones
-![Predicciones](screenshots/predicciones.png)
-
-### Chatbot
-![Chatbot](screenshots/chatbot.png)
-```
 
 ---
 

@@ -4,6 +4,30 @@
 
 El sistema está compuesto por cuatro módulos principales:
 
+```mermaid
+flowchart LR
+  subgraph FE [Frontend]
+    A[Browser UI\n(HTML/CSS/JS)]
+  end
+  subgraph BE [Backend]
+    B[Flask app\n(routes, API)]
+  end
+  subgraph ML [Modelo]
+    C[Scikit-Learn\nRandomForest]\n  end
+  subgraph DB [Base de datos]
+    D[SQLite\n(mundial.db)]
+  end
+  subgraph CB [Chatbot]
+    E[Keyword-based\nchat logic]
+  end
+
+  A --> B
+  B --> C
+  B --> D
+  B --> E
+  C --> D
+```
+
 ### Frontend
 
 Desarrollado con HTML5, CSS3 y JavaScript.
