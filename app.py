@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request, jsonify
 import re
 import unicodedata
+import sqlite3
+import io
+import csv
+from flask import Response
 
 app = Flask(__name__)
 
@@ -510,7 +514,57 @@ def equipos_view():
 
 @app.route("/predicciones")
 def predicciones():
-    return render_template("predicciones.html", matches=matches, flags=flags)
+    # Use DB-backed matches if available for richer predictions and filters
+    db = 'mundial.db'
+    q_group = request.args.get('group')
+    q_team = request.args.get('team')
+    min_prob = float(request.args.get('min_prob') or 0)
+
+    matches_list = []
+    if os.path.exists(db):
+        conn = sqlite3.connect(db)
+        cur = conn.cursor()
+        sql = 'SELECT id, grupo, date, teamA, teamB, flagA, flagB, pred_probA, pred_probD, pred_probB, predicted, predicted_home_score, predicted_away_score, source FROM matches'
+        clauses = []
+        params = []
+        if q_group:
+            clauses.append('grupo = ?')
+            params.append(q_group)
+        if q_team:
+            clauses.append('(teamA = ? OR teamB = ?)')
+            params.extend([q_team, q_team])
+        if clauses:
+            sql += ' WHERE ' + ' AND '.join(clauses)
+        cur.execute(sql, params)
+        for row in cur.fetchall():
+            mid, grupo, date, teamA, teamB, flagA, flagB, pA, pD, pB, predicted, ph, pa, source = row
+            pA = pA or 0
+            pD = pD or 0
+            pB = pB or 0
+            if max(pA, pD, pB) < min_prob:
+                continue
+            matches_list.append({
+                'id': mid,
+                'grupo': grupo,
+                'date': date,
+                'teamA': teamA,
+                'teamB': teamB,
+                'flagA': flagA,
+                'flagB': flagB,
+                'probWinA': round((pA or 0)*100,2),
+                'probDraw': round((pD or 0)*100,2),
+                'probWinB': round((pB or 0)*100,2),
+                'predicted': predicted,
+                'predicted_home_score': ph,
+                'predicted_away_score': pa,
+                'source': source,
+            })
+        conn.close()
+    else:
+        matches_list = matches
+
+    groups_list = list(grupos.keys())
+    return render_template("predicciones.html", matches=matches_list, flags=flags, groups=groups_list)
 
 @app.route("/")
 def inicio():
@@ -525,6 +579,48 @@ def tabla():
     data = calcular_tabla_posiciones()
     return render_template("tabla.html", tabla=data)
 
+
+@app.route("/estadisticas")
+def estadisticas():
+    db = 'mundial.db'
+    stats = {}
+    samples = []
+    if os.path.exists(db):
+        conn = sqlite3.connect(db)
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM teams")
+        stats['teams'] = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM matches")
+        stats['matches'] = cur.fetchone()[0]
+        cur.execute("SELECT source, COUNT(*) FROM matches GROUP BY source")
+        stats['by_source'] = cur.fetchall()
+        cur.execute("SELECT teamA, teamB, home_score, away_score, date, source FROM matches WHERE home_score IS NOT NULL OR away_score IS NOT NULL ORDER BY date DESC LIMIT 20")
+        samples = cur.fetchall()
+        conn.close()
+    else:
+        stats = {'teams': 0, 'matches': 0, 'by_source': []}
+
+    return render_template('estadisticas.html', stats=stats, samples=samples)
+
+
+@app.route('/export_csv')
+def export_csv():
+    db = 'mundial.db'
+    si = io.StringIO()
+    writer = csv.writer(si)
+    header = ['id','grupo','date','teamA','teamB','home_score','away_score','predicted','pred_probA','pred_probD','pred_probB','source']
+    writer.writerow(header)
+
+    if os.path.exists(db):
+        conn = sqlite3.connect(db)
+        cur = conn.cursor()
+        for row in cur.execute('SELECT id, grupo, date, teamA, teamB, home_score, away_score, predicted, pred_probA, pred_probD, pred_probB, source FROM matches'):
+            writer.writerow(row)
+        conn.close()
+
+    output = si.getvalue()
+    return Response(output, mimetype='text/csv', headers={"Content-disposition": "attachment; filename=matches_export.csv"})
+
 # =========================
 # API (TIEMPO REAL)
 # =========================
@@ -537,6 +633,30 @@ def api_chatbot():
     respuesta = responder_chatbot(pregunta)
 
     return jsonify({"respuesta": respuesta})
+
+
+@app.route('/api/matches', methods=['GET'])
+def api_matches():
+    db = 'mundial.db'
+    out = []
+    if os.path.exists(db):
+        conn = sqlite3.connect(db)
+        cur = conn.cursor()
+        q = "SELECT id, grupo, date, teamA, teamB, pred_probA, pred_probD, pred_probB, predicted, source FROM matches"
+        for row in cur.execute(q):
+            out.append({
+                'id': row[0], 'grupo': row[1], 'date': row[2], 'teamA': row[3], 'teamB': row[4],
+                'pred_probA': row[5], 'pred_probD': row[6], 'pred_probB': row[7], 'predicted': row[8], 'source': row[9]
+            })
+        conn.close()
+    else:
+        # fallback to in-memory
+        for m in matches:
+            out.append({
+                'teamA': m.get('teamA'), 'teamB': m.get('teamB'), 'date': m.get('date'),
+                'probWinA': m.get('probWinA'), 'probDraw': m.get('probDraw'), 'probWinB': m.get('probWinB')
+            })
+    return jsonify(out)
 
 # =========================
 # RUN

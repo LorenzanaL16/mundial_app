@@ -1,0 +1,40 @@
+{% extends "Base.html" %}
+
+{% block content %}
+
+<h1>📈 Estadísticas Históricas</h1>
+
+<div class="stats">
+    <p><strong>Equipos en BD:</strong> {{ stats.teams }}</p>
+    <p><strong>Partidos en BD:</strong> {{ stats.matches }}</p>
+    <p><strong>Por fuente:</strong></p>
+    <ul>
+        {% for s, c in stats.by_source %}
+            <li>{{ s }}: {{ c }}</li>
+        {% endfor %}
+    </ul>
+
+    <p><a class="btn" href="/export_csv">Exportar matches a CSV</a></p>
+</div>
+
+<h2>Últimos resultados (históricos)</h2>
+<table>
+    <tr>
+        <th>Fecha</th>
+        <th>Equipo A</th>
+        <th>Equipo B</th>
+        <th>Score</th>
+        <th>Fuente</th>
+    </tr>
+    {% for teamA, teamB, home, away, date, source in samples %}
+    <tr>
+        <td>{{ date or '-' }}</td>
+        <td>{{ teamA }}</td>
+        <td>{{ teamB }}</td>
+        <td>{% if home is not none and away is not none %}{{ home }} - {{ away }}{% else %}-{% endif %}</td>
+        <td>{{ source }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
