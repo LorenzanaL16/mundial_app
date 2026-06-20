@@ -1,71 +1,112 @@
 # Predictor Mundial FIFA 2026
 
-Aplicación web desarrollada con Flask para visualizar información del Mundial FIFA 2026, incluyendo grupos, equipos clasificados, fixture, predicciones y un chatbot de apoyo.
+Aplicación web desarrollada con Flask e Inteligencia Artificial para simular y analizar el Mundial FIFA 2026.
 
-## Características
+El sistema permite consultar grupos, equipos participantes, fixture, estadísticas históricas, predicciones de partidos mediante Machine Learning y realizar consultas a través de un chatbot inteligente.
 
-- Visualización de grupos del Mundial 2026.
-- Listado de equipos clasificados.
-- Visualización del fixture de partidos.
-- Predicciones de resultados.
-- Interfaz web responsiva.
-- Integración de banderas de las selecciones.
-- Chatbot de asistencia para consultas del torneo.
+---
 
-## Tecnologías utilizadas
+# Características
 
-- Python
-- Flask
-- HTML5
-- CSS3
-- Git
-- GitHub
+* Visualización de grupos del Mundial 2026.
+* Consulta de equipos participantes.
+* Fixture completo del torneo.
+* Predicción automática de resultados.
+* Tabla de posiciones simulada.
+* Estadísticas de rendimiento de selecciones.
+* Base de datos SQLite para almacenamiento.
+* Chatbot con respuestas sobre el torneo.
+* Interfaz web responsiva.
+* Sistema de banderas para cada selección.
 
-## Estructura del proyecto
+---
+
+# Tecnologías utilizadas
+
+## Backend
+
+* Python
+* Flask
+* SQLite
+
+## Inteligencia Artificial
+
+* Scikit-Learn
+* Pandas
+* NumPy
+* Joblib
+
+## Frontend
+
+* HTML5
+* CSS3
+* JavaScript
+
+## Control de versiones
+
+* Git
+* GitHub
+
+---
+
+# Estructura del proyecto
 
 ```text
 mundial_app/
 │
 ├── app.py
-├── download_flags.py
+├── model.py
+├── model.pkl
+├── mundial.db
+├── results.csv
 │
 ├── static/
 │   ├── css/
-│   │   └── style.css
 │   └── img/
-│       └── flags/
 │
 ├── templates/
 │   ├── base.html
 │   ├── index.html
+│   ├── inicio.html
 │   ├── grupos.html
 │   ├── equipos.html
 │   ├── fixture.html
 │   ├── predicciones.html
+│   ├── tabla.html
+│   ├── estadisticas.html
 │   └── chatbot.html
+│
+├── crear_bd.py
+├── guardar_predicciones.py
+├── aplicar_predicciones_heuristicas.py
+├── download_flags.py
 │
 └── README.md
 ```
 
-## Instalación
+---
 
-1. Clonar el repositorio:
+# Instalación
+
+## 1. Clonar repositorio
 
 ```bash
 git clone URL_DEL_REPOSITORIO
 ```
 
-2. Entrar al proyecto:
+## 2. Entrar al proyecto
 
 ```bash
 cd mundial_app
 ```
 
-3. Crear y activar entorno virtual:
+## 3. Crear entorno virtual
 
 ```bash
 python -m venv .venv
 ```
+
+## 4. Activar entorno
 
 Windows:
 
@@ -73,36 +114,69 @@ Windows:
 .venv\Scripts\activate
 ```
 
-4. Instalar dependencias:
+## 5. Instalar dependencias
 
 ```bash
-pip install flask requests
+pip install -r requirements.txt
 ```
 
-5. Ejecutar la aplicación:
+## 6. Ejecutar aplicación
 
 ```bash
 python app.py
 ```
 
-6. Abrir en el navegador:
+## 7. Abrir navegador
 
 ```text
 http://127.0.0.1:5000
 ```
 
-## Integrantes
+---
 
-- Jaquelin Natalia Lorenzana León
-- Salvador André Martínez Juárez
+# Modelo de Machine Learning
 
-## Universidad
+El sistema utiliza un modelo de clasificación entrenado con resultados históricos de partidos internacionales.
+
+Dataset utilizado:
+
+International Football Results Dataset
+
+https://kaggle.com/datasets/martj42/international-football-results-from-1872-to-2017
+
+El modelo genera predicciones de resultados que posteriormente son utilizadas para construir tablas de posiciones y simulaciones del torneo.
+
+---
+
+# Capturas de pantalla
+
+Agregar imágenes de:
+
+* Página principal
+* Grupos
+* Fixture
+* Predicciones
+* Estadísticas
+* Chatbot
+
+---
+
+# Integrantes
+
+* Jaquelin Natalia Lorenzana León
+* Salvador André Martínez Juárez
+
+---
+
+# Universidad
 
 Universidad Mariano Gálvez de Guatemala
 
-Proyecto académico desarrollado para el curso de Inteligencia Artificial.
+Curso: Inteligencia Artificial
 
-## Estado del proyecto
+---
 
-En desarrollo.
-Actualmente incluye grupos, equipos clasificados, sistema de banderas e interfaces principales.
+# Estado del proyecto
+
+Proyecto funcional desarrollado como parte de la evaluación final del curso de Inteligencia Artificial, integrando Machine Learning, base de datos y desarrollo web.
+
